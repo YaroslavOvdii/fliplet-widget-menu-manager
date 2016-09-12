@@ -1,0 +1,28 @@
+{
+  "name": "Menu Manager",
+  "package": "com.fliplet.menu-manager",
+  "version": "1.0.0",
+  "icon": "img/icon.png",
+  "tags": ["category:general"],
+  "provider_only": true,
+  "providers": [
+    "com.fliplet.link"
+  ],
+  "interface": {
+    "dependencies": [
+      "jquery",
+      "handlebars",
+      "bootstrap",
+      "fliplet-datasources",
+      "fliplet-studio-ui"
+    ],
+    "assets": [
+      "js/interface.js",
+      "css/interface.css"
+    ]
+  },
+  "build": {
+    "dependencies": [],
+    "assets": []
+  }
+}

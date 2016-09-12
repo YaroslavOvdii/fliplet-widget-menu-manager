@@ -1,0 +1,107 @@
+<div class="widget-holder">
+
+  <header>
+    <p>Main Menu</p>
+    <a href="#">Need help?</a>
+  </header>
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation"><a href="#menu-settings" aria-controls="menu-settings" role="tab" data-toggle="tab">Main Menu Settings</a></li>
+    <li role="presentation" class="active"><a href="#menu-manager" aria-controls="menu-manager" role="tab" data-toggle="tab">Menu Manager</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane" id="menu-settings">
+      <div class="controls">
+        <p>This feature will be available soon when we add new menu styles.</p>
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane active" id="menu-manager">
+
+      <div class="" id="initial-holder">
+        <div class="controls">
+          <p>You have not created any menus yet. Create a new menu to get started.</p>
+          <button class="btn btn-primary start-item">Create Menu</button>
+        </div>
+      </div>
+
+      <div class="" id="panel-holder">
+        <form class="form-horizontal">
+
+          <div class="form-group">
+            <div class="col-sm-4 control-label">
+              <label for="select-menu">Select a menu</label>
+            </div>
+            <div class="col-sm-8">
+              <label for="select-menu" class="select-proxy-display">
+                <span class="icon fa fa-chevron-down"></span>
+                <span class="select-value-proxy">Select a menu</span>
+                <select name="select_menu" id="select-menu" data-label="select" class="hidden-select form-control">
+                  <option selected value="none">Select a menu</option>
+                </select>
+              </label>
+              <span class="text-helper">or <a href="#">create a new menu</a></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-4 control-label">
+              <label for="menu-name">Menu name</label>
+            </div>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="menu_name" id="menu-name" placeholder="Enter the menu name" value="Untitled Menu 1" />
+              <span class="text-helper"><a href="#" class="text-danger">Delete menu</a></span>
+            </div>
+          </div>
+
+        </form>
+
+        <div class="title-header">
+          <p>Menu links</p>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-default start-item">Add menu link</button>
+        </div>
+
+        <div class="panel-group ui-sortable" id="accordion">
+          <!-- LINKS -->
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<template id="template-menuOption">
+  <option value="\{{id}}">\{{name}}</option>
+</template>
+
+<template id="template-menu">
+  <div class="menu" id="menu-\{{id}}" >
+  </div>
+</template>
+
+<template id="template-menuLink">
+  <div class="panel panel-default" data-id="\{{id}}">
+    <div class="panel-heading ui-sortable-handle">
+      <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" data-target="#collapse-\{{id}}">
+        <div class="screen-reorder-handle">
+          <i class="fa fa-ellipsis-v"></i><i class="fa fa-ellipsis-v"></i>
+        </div>
+        <span class="fa fa-chevron-right"></span>
+        <span class="panel-title-text">\{{linkLabel}}</span>
+      </h4>
+      <a href="#"><span class="icon-delete fa fa-trash"></span></a>
+    </div>
+    <div id="collapse-\{{id}}" class="panel-collapse collapse">
+      <div class="panel-body">
+        <div class="form-horizontal link">
+
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
