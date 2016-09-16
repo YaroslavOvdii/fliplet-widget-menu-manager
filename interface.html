@@ -36,8 +36,9 @@
               <label for="select-menu" class="select-proxy-display">
                 <span class="icon fa fa-chevron-down"></span>
                 <span class="select-value-proxy">Select a menu</span>
+
                 <select name="select_menu" id="select-menu" data-label="select" class="hidden-select form-control">
-                  <option selected value="none">Select a menu</option>
+                  <option selected>Select a menu</option>
                 </select>
               </label>
               <span class="text-helper">or <a href="#">create a new menu</a></span>
@@ -72,6 +73,8 @@
       </div>
     </div>
   </div>
+
+  <a class="btn btn-primary" id="save">Save</a>
 </div>
 
 <template id="template-menuOption">
@@ -79,7 +82,7 @@
 </template>
 
 <template id="template-menu">
-  <div class="menu" id="menu-\{{id}}" >
+  <div class="menu" id="menu-\{{id}}" style="display: none">
   </div>
 </template>
 
@@ -91,7 +94,7 @@
           <i class="fa fa-ellipsis-v"></i><i class="fa fa-ellipsis-v"></i>
         </div>
         <span class="fa fa-chevron-right"></span>
-        <span class="panel-title-text">\{{linkLabel}}</span>
+        <span class="panel-title-text">\{{data.action.linkLabel}}</span>
       </h4>
       <a href="#"><span class="icon-delete fa fa-trash"></span></a>
     </div>
