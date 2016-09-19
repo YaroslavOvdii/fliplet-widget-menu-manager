@@ -3,8 +3,10 @@
     menuOption: template('menuOption'),
     menuLink: template('menuLink'),
     menu: template('menu')
-
   };
+
+  var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages' };
+  var $appMenu = $('#app-menu');
 
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
@@ -16,7 +18,7 @@
   Fliplet.DataSources.get({ type: 'menu' })
     .then(function (dataSources) {
       if (dataSources.length === 0) {
-        $("#intial-holder").show();
+        $("#initial-holder").show();
       } else {
         $("#panel-holder").show();
       }
@@ -26,6 +28,8 @@
         menusData[dataSource.id] = [];
         $('#select-menu').append(templates.menuOption(dataSource));
         $('#accordion').append(templates.menu(dataSource));
+
+        $appMenu.append('<option value="' + dataSource.id + '">' + dataSource.name + '</option>');
 
         Fliplet.DataSources.connect(dataSource.id)
           .then(function (source) {
@@ -59,16 +63,26 @@
           });
       });
 
+      $appMenu
+        .val(topMenu.id)
+        .change(function () {
+          var value = $(this).val();
+          topMenu.id = value;
+          Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
+            Fliplet.Studio.emit('reload-page-preview');
+          });
+        })
+
       console.log('Data Sources: ', dataSources);
     });
-  
+
   // Listeners
   $('#select-menu').on('change', function onMenuChange() {
     // Change visible links
     var menuId = $(this).val();
     $('#accordion .menu').hide();
     $('#menu-' + menuId).show();
-    
+
     // Change menu name on input
     var menuName = getSelectedMenuName();
     setMenuName(menuName);
