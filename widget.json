@@ -10,11 +10,13 @@
   ],
   "interface": {
     "dependencies": [
+      "fliplet-datasources",
+      "fliplet-studio-ui",
       "jquery",
+      "jquery-ui",
       "handlebars",
       "bootstrap",
-      "fliplet-datasources",
-      "fliplet-studio-ui"
+      "lodash"
     ],
     "assets": [
       "js/interface.js",
