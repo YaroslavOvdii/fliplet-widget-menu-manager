@@ -31,14 +31,11 @@
       $appMenu
         .val(topMenu.id)
         .change(function () {
-          var value = $(this).val();
-          topMenu.id = value;
+          topMenu.id = $(this).val();
           Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
             Fliplet.Studio.emit('reload-page-preview');
           });
         });
-
-      console.log('Data Sources: ', dataSources);
     });
 
   // Listeners
@@ -82,18 +79,16 @@
 
 
   $('#select-menu, #app-menu').on('change', function onMenuChange() {
-    var selectedText = $(this).find("option:selected").text();
+    var selectedText = $(this).find('option:selected').text();
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
 
     // Change visible links
     var menuId = $(this).val();
-    if (menuId === "0") {
-      $('#menu-name-group').hide();
-    } else {
-      $('#menu-name-group').show();
-    }
 
+    // Hide all menu panels
     $('#accordion .menu').hide();
+
+    // Show only the selected one
     $('#menu-' + menuId).show();
 
     // Change menu name on input
@@ -101,9 +96,13 @@
     setMenuName(menuName);
 
     // Set current data source
-    if (menuId == "0") {
+    if (menuId == 0) {
+      $('#menu-name-group').hide();
       currentDataSource = null;
+      $('#add-link').hide();
     } else {
+      $('#menu-name-group').show();
+      $('#add-link').show();
       Fliplet.DataSources.connect(menuId)
         .then(function (source) {
           currentDataSource = source;
@@ -135,21 +134,27 @@
         });
     }
 
+    // Add order to the links
+    var sortedIds = $('#menu-' + selectedMenuId).sortable("toArray" ,{attribute: 'data-id'});
+
+    menusPromises[selectedMenuId].forEach(function (linkActionProvider) {
+      linkActionProvider.row.data.order = sortedIds.indexOf(linkActionProvider.row.id.toString());
+    });
+
     // Update Links
-    Promise.all(menusPromises[selectedMenuId])
-      .then(function () {
-        var entries = menusPromises[selectedMenuId].map(function (value) {
-          return value.row.data;
+    Promise.all(menusPromises[selectedMenuId].map(function (provider) {
+      return new Promise(function (resolve, reject) {
+        provider.then(function (result) {
+          provider.row.data.action = result;
+          resolve(provider.row.data);
         });
-
-        Fliplet.DataSources.connect(selectedMenuId)
-          .then(function (source) {
-            return source.replaceWith(entries);
-          })
-
-        console.log('All saved');
-        console.log('entries---', entries);
       });
+    })).then(function (entries) {
+      return Fliplet.DataSources.connect(selectedMenuId)
+        .then(function (source) {
+          return source.replaceWith(entries);
+        })
+    });
 
     menusPromises[selectedMenuId].forEach(function (linkActionProvider) {
       linkActionProvider.forwardSaveRequest();
@@ -190,22 +195,13 @@
       stop: function(event, ui) {
         ui.item.removeClass('focus');
         $('.panel').not(ui.item).removeClass('faded');
-
-        var sortedIds = $('#menu-' + dataSource.id).sortable("toArray" ,{attribute: 'data-id'}).map(function (value) {
-          return Number(value);
-        });
-
-        menusPromises[dataSource.id].forEach(function (linkActionProvider) {
-          linkActionProvider.row.data.order = sortedIds.indexOf(linkActionProvider.row.id);
-        });
       }
     });
   }
 
   function addLink(dataSourceId, row) {
     // Generate a random ID
-    // We don't care about existing record ID on the data source
-    var id = 'id-' + Math.random().toString(36).substr(2, 16)
+    var id = 'id-' + Math.random().toString(36).substr(2, 16);
 
     // Check if it's an existing link or a new one
     row = row || {
@@ -227,14 +223,6 @@
     });
 
     linkActionProvider.row = row;
-    
-    linkActionProvider.then(function (data) {
-      console.log('Data to save: ', data);
-      linkActionProvider.row.data.action = data.data;
-
-      return Promise.resolve();
-    });
-    
     menusPromises[dataSourceId].push(linkActionProvider);
   }
 
