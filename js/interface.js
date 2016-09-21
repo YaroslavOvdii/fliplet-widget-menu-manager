@@ -54,19 +54,13 @@
   });
 
   $('#add-link').on('click', function () {
-    currentDataSource.insert()
-      .then(function (row) {
-        addLink(currentDataSource.id, row)
-      })
+    addLink(currentDataSource.id);
   });
 
   $('#delete-menu').on('click', function () {
     var menuId = getSelectedMenuId();
-    Fliplet.DataSources.delete(menuId)
-      .then(function () {
-        $("#select-menu option[value='"+menuId+"']").remove();
-      })
-
+    delete(menusPromises[menuId]);
+    $("#select-menu option[value='"+menuId+"']").remove();
     $('#select-menu').val(0).change();
   });
 
@@ -74,13 +68,16 @@
   $("#accordion")
     .on('click', '.icon-delete', function() {
       var $item = $(this).closest("[data-id], .panel"),
-        id = $item.data('id');
+          id = $item.data('id');
 
       $item.remove();
 
-      currentDataSource.removeById(id)
-        .then(function (row) {
-        })
+      for (var i = 0; i < menusPromises[currentDataSource.id].length; i++) {
+        if (menusPromises[currentDataSource.id][i].row.id === id) {
+          menusPromises[currentDataSource.id].splice(i, 1);
+          break;
+        }
+      }
     });
 
 
@@ -139,20 +136,22 @@
     }
 
     // Update Links
-    menusPromises[selectedMenuId].forEach(function (linkActionProvider) {
-      console.log('Row attached: ', linkActionProvider.row);
-
-      linkActionProvider.then(function (data) {
-        console.log('Data to save: ', data);
-        linkActionProvider.row.data.action = data.data;
-
+    Promise.all(menusPromises[selectedMenuId])
+      .then(function () {
+        var entries = menusPromises[selectedMenuId].map(function (value) {
+          return value.row.data;
+        });
 
         Fliplet.DataSources.connect(selectedMenuId)
           .then(function (source) {
-            return source.update(linkActionProvider.row)
-          });
+            return source.replaceWith(entries);
+          })
+
+        console.log('All saved');
+        console.log('entries---', entries);
       });
 
+    menusPromises[selectedMenuId].forEach(function (linkActionProvider) {
       linkActionProvider.forwardSaveRequest();
     })
   });
@@ -204,22 +203,39 @@
   }
 
   function addLink(dataSourceId, row) {
-    if ($.isEmptyObject(row.data)) {
-      row.data.action = {
-        options: { label: true },
-        linkLabel: 'Link label'
+    // Generate a random ID
+    // We don't care about existing record ID on the data source
+    var id = 'id-' + Math.random().toString(36).substr(2, 16)
+
+    // Check if it's an existing link or a new one
+    row = row || {
+        data: {
+          action: {
+            options: {label: true},
+            linkLabel: 'Link label'
+          }
+        },
+        id: id
       };
-    }
 
     $('#menu-' + dataSourceId).append(templates.menuLink(row));
 
-    var linkProvider = Fliplet.Widget.open('com.fliplet.link', {
+    var linkActionProvider = Fliplet.Widget.open('com.fliplet.link', {
       closeOnSave: false,
       selector: '[data-id='+ row.id +']  .link',
       data: row.data.action
     });
-    linkProvider.row = row;
-    menusPromises[dataSourceId].push(linkProvider);
+
+    linkActionProvider.row = row;
+    
+    linkActionProvider.then(function (data) {
+      console.log('Data to save: ', data);
+      linkActionProvider.row.data.action = data.data;
+
+      return Promise.resolve();
+    });
+    
+    menusPromises[dataSourceId].push(linkActionProvider);
   }
 
 
