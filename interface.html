@@ -24,7 +24,6 @@
             <select id="app-menu" class="hidden-select form-control">
               <option value="">Hide menu</option>
               <option value="pages" selected>All screens</option>
-              <option disabled>──────────</option>
             </select>
           </label>
         </div>
@@ -68,21 +67,19 @@
               <span class="text-helper"><a href="#" class="text-danger" id="delete-menu">Delete menu</a></span>
             </div>
           </div>
-
         </form>
+        <div id="menu-links" style="display: none">
+          <div class="title-header">
+            <p>Menu links</p>
+          </div>
 
-        <div class="title-header">
-          <p>Menu links</p>
-        </div>
+          <div class="controls">
+            <button class="btn btn-default start-item" id="add-link" style="display: none">Add menu link</button>
+          </div>
 
-        <div class="controls">
-          <button class="btn btn-default start-item" id="add-link" style="display: none">Add menu link</button>
-        </div>
-
-        <div class="panel-group ui-sortable" id="accordion">
-          <!-- LINKS -->
-
-
+          <div class="panel-group ui-sortable" id="accordion">
+            <!-- LINKS -->
+          </div>
         </div>
       </div>
     </div>

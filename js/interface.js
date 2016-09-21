@@ -43,11 +43,10 @@
     Fliplet.DataSources.create({ name: 'Menu Title', type: 'menu' })
       .then(function (dataSource) {
         addMenu(dataSource);
-
         $('#select-menu').val(dataSource.id).change();
         $("#panel-holder").show();
+        $("#initial-holder").hide();
       })
-
   });
 
   $('#add-link').on('click', function () {
@@ -59,10 +58,10 @@
     Fliplet.DataSources.delete(menuId);
     delete(menusPromises[menuId]);
     $("#select-menu option[value='"+menuId+"']").remove();
+    $appMenu.find("option[value='"+menuId+"']").remove();
     $('#select-menu').val(0).change();
   });
-
-
+  
   $("#accordion")
     .on('click', '.icon-delete', function() {
       var $item = $(this).closest("[data-id], .panel"),
@@ -79,9 +78,8 @@
     });
 
 
-  $('#select-menu, #app-menu').on('change', function onMenuChange() {
-    var selectedText = $(this).find('option:selected').text();
-    $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
+  $('#select-menu').on('change', function onMenuChange() {
+    updateSelectMenuText();
 
     // Change visible links
     var menuId = $(this).val();
@@ -100,12 +98,14 @@
     if (menuId == 0) {
       $('#menu-name-group').hide();
       $('#save').hide();
+      $('#menu-links').hide();
       currentDataSource = null;
       $('#add-link').hide();
     } else {
       $('#menu-name-group').show();
       $('#add-link').show();
       $('#save').show();
+      $('#menu-links').show();
       Fliplet.DataSources.connect(menuId)
         .then(function (source) {
           currentDataSource = source;
@@ -116,32 +116,33 @@
   $('#save').on('click', function () {
     // Get new data source name
     var newMenuName = getMenuName();
-    var selectedMenuId = getSelectedMenuId();
 
-    if (!selectedMenuId) {
+    if (!currentDataSource.id) {
       return;
     }
 
-    var options = {
-      id: selectedMenuId,
-      name: newMenuName
-    };
-
     // Update data source if name was changed
     if (getSelectedMenuName() !== newMenuName) {
-      $("#select-menu option:selected").text(newMenuName).change();
+      $("#select-menu option:selected").text(newMenuName);
+      updateSelectMenuText();
+      $appMenu.find("option[value='" + currentDataSource.id + "']").text(newMenuName).change();
 
-      Fliplet.DataSources.update(options)
+      var updateOptions = {
+        id: currentDataSource.id,
+        name: newMenuName
+      };
+      
+      Fliplet.DataSources.update(updateOptions)
         .then(function () {
           setSelectedMenuName(newMenuName);
         });
     }
 
     // Get order of links
-    var sortedIds = $('#menu-' + selectedMenuId).sortable("toArray" ,{attribute: 'data-id'});
+    var sortedIds = $('#menu-' + currentDataSource.id).sortable("toArray" ,{attribute: 'data-id'});
 
     // Update Links
-    Promise.all(menusPromises[selectedMenuId].map(function (provider) {
+    Promise.all(menusPromises[currentDataSource.id].map(function (provider) {
       // Set link order
       provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
 
@@ -153,13 +154,13 @@
         });
       });
     })).then(function (entries) {
-      return Fliplet.DataSources.connect(selectedMenuId)
+      return Fliplet.DataSources.connect(currentDataSource.id)
         .then(function (source) {
           return source.replaceWith(entries);
         })
     });
 
-    menusPromises[selectedMenuId].forEach(function (linkActionProvider) {
+    menusPromises[currentDataSource.id].forEach(function (linkActionProvider) {
       linkActionProvider.forwardSaveRequest();
     })
   });
@@ -170,7 +171,7 @@
     $('#select-menu').append(templates.menuOption(dataSource));
     $('#accordion').append(templates.menu(dataSource));
 
-    $appMenu.append('<option value="' + dataSource.id + '">' + dataSource.name + '</option>');
+    $appMenu.append(templates.menuOption(dataSource));
 
     Fliplet.DataSources.connect(dataSource.id)
       .then(function (source) {
@@ -249,5 +250,10 @@
 
   function setMenuName(name) {
     return $('#menu-name').val(name);
+  }
+
+  function updateSelectMenuText() {
+    var selectedText = $('#select-menu').find('option:selected').text();
+    $('#select-menu').parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   }
 })();
