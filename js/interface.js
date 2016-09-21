@@ -134,15 +134,15 @@
         });
     }
 
-    // Add order to the links
+    // Get order of links
     var sortedIds = $('#menu-' + selectedMenuId).sortable("toArray" ,{attribute: 'data-id'});
-
-    menusPromises[selectedMenuId].forEach(function (linkActionProvider) {
-      linkActionProvider.row.data.order = sortedIds.indexOf(linkActionProvider.row.id.toString());
-    });
 
     // Update Links
     Promise.all(menusPromises[selectedMenuId].map(function (provider) {
+      // Set link order
+      provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
+
+      // Do stuff in here with result from provider
       return new Promise(function (resolve, reject) {
         provider.then(function (result) {
           provider.row.data.action = result;
