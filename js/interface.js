@@ -7,7 +7,7 @@
 
   var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages' };
   var $appMenu = $('#app-menu');
-  
+
   var currentDataSource;
 
   function template(name) {
@@ -84,7 +84,7 @@
     });
 
 
-  $('#select-menu').on('change', function onMenuChange() {
+  $('#select-menu, #app-menu').on('change', function onMenuChange() {
     var selectedText = $(this).find("option:selected").text();
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
 
@@ -102,7 +102,7 @@
     // Change menu name on input
     var menuName = getSelectedMenuName();
     setMenuName(menuName);
-    
+
     // Set current data source
     if (menuId == "0") {
       currentDataSource = null;
