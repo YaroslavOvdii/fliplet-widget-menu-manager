@@ -99,11 +99,13 @@
     // Set current data source
     if (menuId == 0) {
       $('#menu-name-group').hide();
+      $('#save').hide();
       currentDataSource = null;
       $('#add-link').hide();
     } else {
       $('#menu-name-group').show();
       $('#add-link').show();
+      $('#save').show();
       Fliplet.DataSources.connect(menuId)
         .then(function (source) {
           currentDataSource = source;
