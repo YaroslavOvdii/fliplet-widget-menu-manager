@@ -106,13 +106,22 @@
           <i class="fa fa-ellipsis-v"></i><i class="fa fa-ellipsis-v"></i>
         </div>
         <span class="fa fa-chevron-right"></span>
-        <span class="panel-title-text">\{{data.action.linkLabel}}</span>
+        <span class="panel-title-text">\{{data.linkLabel}}</span>
       </h4>
       <a href="#"><span class="icon-delete fa fa-trash"></span></a>
     </div>
     <div id="collapse-\{{id}}" class="panel-collapse collapse">
       <div class="panel-body">
+        <div class="form-group clearfix">
+          <div class="col-sm-4 control-label">
+            <label>Link label</label>
+          </div>
+          <div class="col-sm-8">
+            <input type="text" class="form-control link-label" value="\{{data.linkLabel}}"/>
+          </div>
+        </div>
         <div class="form-horizontal link">
+          <!-- Render Provider iFrame here -->
 
         </div>
       </div>

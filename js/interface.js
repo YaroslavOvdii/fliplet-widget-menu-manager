@@ -77,7 +77,6 @@
       }
     });
 
-
   $('#select-menu').on('change', function onMenuChange() {
     updateSelectMenuText();
 
@@ -143,17 +142,17 @@
 
     // Update Links
     Promise.all(menusPromises[currentDataSource.id].map(function (provider) {
-      // Set link order
-      provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
-
       // Do stuff in here with result from provider
       return new Promise(function (resolve, reject) {
         provider.then(function (result) {
+          provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
+          provider.row.data.linkLabel = $('[data-id="' + provider.row.id + '"]').find('.link-label').val();
           provider.row.data.action = result;
           resolve(provider.row.data);
         });
       });
     })).then(function (entries) {
+      console.log('Entries--', entries);
       return Fliplet.DataSources.connect(currentDataSource.id)
         .then(function (source) {
           return source.replaceWith(entries);
@@ -210,10 +209,8 @@
     // Check if it's an existing link or a new one
     row = row || {
         data: {
-          action: {
-            options: {label: true},
-            linkLabel: 'Link label'
-          }
+          action: { },
+          linkLabel: 'Menu Link'
         },
         id: id
       };
@@ -229,7 +226,6 @@
     linkActionProvider.row = row;
     menusPromises[dataSourceId].push(linkActionProvider);
   }
-
 
   // Getters / Setters
   function getSelectedMenuId() {
