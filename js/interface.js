@@ -75,6 +75,9 @@
           break;
         }
       }
+    })
+    .on('keyup change paste', '.link-label', function() {
+      $(this).parents('.panel').find('.panel-title-text').html(this.value);
     });
 
   $('#select-menu').on('change', function onMenuChange() {
