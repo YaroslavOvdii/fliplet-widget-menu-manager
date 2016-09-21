@@ -4,6 +4,9 @@ body {
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #333333;
 }
+.widget-holder {
+    padding: 0 15px;
+}
 .btn {
     border-radius: 6px;
     line-height: 44px;
@@ -75,6 +78,15 @@ header p {
 }
 header a {
     text-decoration: none;
+}
+footer {
+    background-color: #f2f6f7;
+    border-top: 1px solid #d9ddde;
+    padding: 1rem 15px;
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    right: 0;
 }
 /* TABS */
 .nav-tabs > li.disable {
