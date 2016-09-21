@@ -60,6 +60,10 @@
     $("#select-menu option[value='"+menuId+"']").remove();
     $appMenu.find("option[value='"+menuId+"']").remove();
     $('#select-menu').val(0).change();
+    if ($.isEmptyObject(menusPromises)) {
+      $('#panel-holder').hide();
+      $('#initial-holder').show();
+    }
   });
   
   $("#accordion")
@@ -155,7 +159,6 @@
         });
       });
     })).then(function (entries) {
-      console.log('Entries--', entries);
       return Fliplet.DataSources.connect(currentDataSource.id)
         .then(function (source) {
           return source.replaceWith(entries);
