@@ -56,6 +56,7 @@
 
   $('#delete-menu').on('click', function () {
     var menuId = getSelectedMenuId();
+    Fliplet.DataSources.delete(menuId);
     delete(menusPromises[menuId]);
     $("#select-menu option[value='"+menuId+"']").remove();
     $('#select-menu').val(0).change();
