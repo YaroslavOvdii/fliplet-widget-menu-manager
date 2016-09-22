@@ -123,7 +123,7 @@
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   });
 
-  $('#save').on('click', function () {
+  Fliplet.Widget.onSaveRequest(function () {
     var tab = $('#menu-manager-control').hasClass('active') ? 'manager' : 'settings';
     switch(tab) {
       case 'manager':
