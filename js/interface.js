@@ -28,14 +28,7 @@
         addMenu(dataSource);
       });
 
-      $appMenu
-        .val(topMenu.id)
-        .change(function () {
-          topMenu.id = $(this).val();
-          Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
-            Fliplet.Studio.emit('reload-page-preview');
-          });
-        });
+      $appMenu.val(topMenu.id).change();
     });
 
   // Listeners
@@ -64,8 +57,14 @@
       $('#panel-holder').hide();
       $('#initial-holder').show();
     }
-  });
 
+    // Check if the main setting menu is this one and if it is changed it to All links
+    if (topMenu.id == menuId) {
+      $appMenu.val('pages').change();
+      saveSettings();
+    }
+  });
+  
   $("#accordion")
     .on('click', '.icon-delete', function() {
       var $item = $(this).closest("[data-id], .panel"),
@@ -119,7 +118,29 @@
     }
   });
 
+  $appMenu.on('change', function () {
+    var selectedText = $(this).find('option:selected').text();
+    $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
+  });
+
   $('#save').on('click', function () {
+    var tab = $('#menu-manager-control').hasClass('active') ? 'manager' : 'settings';
+    switch(tab) {
+      case 'manager':
+        saveManager();
+      case 'settings':
+        saveSettings();
+    }
+  });
+
+  function saveSettings() {
+    topMenu.id = $appMenu.val();
+    Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
+      Fliplet.Studio.emit('reload-page-preview');
+    });
+  }
+
+  function saveManager() {
     // Get new data source name
     var newMenuName = getMenuName();
 
@@ -137,10 +158,10 @@
         id: currentDataSource.id,
         name: newMenuName
       };
-
+      
       Fliplet.DataSources.update(updateOptions)
         .then(function () {
-          setSelectedMenuName(newMenuName);
+          $('#select-menu option:selected').text(newMenuName);
         });
     }
 
@@ -244,10 +265,6 @@
 
   function getSelectedMenuName() {
     return $('#select-menu option:selected').text();
-  }
-
-  function setSelectedMenuName(name) {
-    return $('#select-menu option:selected').text(name);
   }
 
   function getMenuName() {
