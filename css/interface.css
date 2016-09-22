@@ -5,7 +5,7 @@ body {
     color: #333333;
 }
 .widget-holder {
-    padding: 15px;
+    overflow: hidden;
 }
 .btn {
     border-radius: 6px;
