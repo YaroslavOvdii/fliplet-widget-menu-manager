@@ -64,7 +64,7 @@
       saveSettings();
     }
   });
-  
+
   $("#accordion")
     .on('click', '.icon-delete', function() {
       var $item = $(this).closest("[data-id], .panel"),
@@ -118,6 +118,11 @@
     }
   });
 
+  $('#menu-manager-link').on('click', function() {
+    $('.nav-tabs .active').removeClass('active');
+    $('#menu-manager-control').addClass('active');
+  });
+
   $appMenu.on('change', function () {
     var selectedText = $(this).find('option:selected').text();
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
@@ -162,7 +167,7 @@
         id: currentDataSource.id,
         name: newMenuName
       };
-      
+
       Fliplet.DataSources.update(updateOptions)
         .then(function () {
           $('#select-menu option:selected').text(newMenuName);
