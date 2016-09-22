@@ -128,8 +128,10 @@
     switch(tab) {
       case 'manager':
         saveManager();
+        break;
       case 'settings':
         saveSettings();
+        break;
     }
   });
 
@@ -138,13 +140,15 @@
     Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
       Fliplet.Studio.emit('reload-page-preview');
     });
+
+    showSuccessMessage();
   }
 
   function saveManager() {
     // Get new data source name
     var newMenuName = getMenuName();
 
-    if (!currentDataSource.id) {
+    if (!currentDataSource) {
       return;
     }
 
@@ -190,10 +194,13 @@
       linkActionProvider.forwardSaveRequest();
     });
 
-    // Show Success Message
+    showSuccessMessage();
+  }
+
+  function showSuccessMessage() {
     $('#success-alert').addClass('saved');
     setTimeout(function(){ $('#success-alert').removeClass('saved'); }, 2000);
-  });
+  }
 
   // Helpers
   function addMenu(dataSource) {
