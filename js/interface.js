@@ -65,7 +65,7 @@
       $('#initial-holder').show();
     }
   });
-  
+
   $("#accordion")
     .on('click', '.icon-delete', function() {
       var $item = $(this).closest("[data-id], .panel"),
@@ -137,7 +137,7 @@
         id: currentDataSource.id,
         name: newMenuName
       };
-      
+
       Fliplet.DataSources.update(updateOptions)
         .then(function () {
           setSelectedMenuName(newMenuName);
@@ -167,7 +167,11 @@
 
     menusPromises[currentDataSource.id].forEach(function (linkActionProvider) {
       linkActionProvider.forwardSaveRequest();
-    })
+    });
+
+    // Show Success Message
+    $('#success-alert').addClass('saved');
+    setTimeout(function(){ $('#success-alert').removeClass('saved'); }, 2000);
   });
 
   // Helpers

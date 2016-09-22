@@ -291,6 +291,14 @@ label {
     width: 100%;
     background-color: transparent;
 }
+#success-alert {
+    opacity: 0;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+}
+#success-alert.saved {
+    opacity: 1;
+}
 @media only screen and (min-width: 640px) {
     header {
         font-size: 1.0em;
