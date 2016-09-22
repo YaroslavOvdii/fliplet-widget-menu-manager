@@ -81,8 +81,7 @@ header a {
 }
 footer {
     background-color: #f2f6f7;
-    border-top: 1px solid #d9ddde;
-    padding: 1rem 15px;
+    padding: 1rem 0 0;
     position: fixed;
     bottom: 0;
     left: 0;
