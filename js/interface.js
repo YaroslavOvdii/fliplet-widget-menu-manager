@@ -5,6 +5,8 @@
     menu: template('menu')
   };
 
+  var appId = Fliplet.Env.get('appId');
+
   var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages' };
   var $appMenu = $('#app-menu');
 
@@ -16,7 +18,7 @@
 
   var menusPromises = {};
 
-  Fliplet.DataSources.get({ type: 'menu' })
+  Fliplet.DataSources.get({ type: 'menu', appId: appId, })
     .then(function (dataSources) {
       if (dataSources.length === 0) {
         $("#initial-holder").show();
@@ -33,7 +35,12 @@
 
   // Listeners
   $('.add-menu').on('click', function () {
-    Fliplet.DataSources.create({ name: 'Menu Title', type: 'menu' })
+    var data = {
+      appId: appId,
+      name: 'Menu Title',
+      type: 'menu'
+    };
+    Fliplet.DataSources.create(data)
       .then(function (dataSource) {
         addMenu(dataSource);
         $('#select-menu').val(dataSource.id).change();
