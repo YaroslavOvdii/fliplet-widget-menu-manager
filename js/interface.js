@@ -184,7 +184,7 @@
         provider.then(function (result) {
           provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
           provider.row.data.linkLabel = $('[data-id="' + provider.row.id + '"]').find('.link-label').val();
-          provider.row.data.action = result;
+          provider.row.data.action = result.data;
           resolve(provider.row.data);
         });
       });
