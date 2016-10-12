@@ -37,7 +37,7 @@
   $('.add-menu').on('click', function () {
     var data = {
       appId: appId,
-      name: 'Menu Title',
+      name: 'Untitled menu',
       type: 'menu'
     };
     Fliplet.DataSources.create(data)
