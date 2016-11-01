@@ -11,6 +11,7 @@
   "interface": {
     "dependencies": [
       "fliplet-datasources",
+      "fliplet-core",
       "fliplet-studio-ui",
       "jquery",
       "jquery-ui",
