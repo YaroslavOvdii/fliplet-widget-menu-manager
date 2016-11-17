@@ -88,6 +88,15 @@
     })
     .on('keyup change paste', '.link-label', function() {
       $(this).parents('.panel').find('.panel-title-text').html(this.value);
+    })
+    .on('show.bs.collapse', '.panel-collapse', function() {
+      $(this).siblings('.panel-heading').find('.fa-chevron-right').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+    })
+    .on('hide.bs.collapse', '.panel-collapse', function() {
+      $(this).siblings('.panel-heading').find('.fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-right');
+    })
+    .on('shown.bs.collapse hidden.bs.collapse', '.panel-collapse', function() {
+      $('.tab-content').trigger('scroll');
     });
 
   $('#select-menu').on('change', function onMenuChange() {
