@@ -7,8 +7,9 @@
 
   var appId = Fliplet.Env.get('appId');
 
-  var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages' };
+  var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages', style: 'default' };
   var $appMenu = $('#app-menu');
+  var $styleMenu = $('#style-menu');
 
   var currentDataSource;
 
@@ -31,6 +32,7 @@
       });
 
       $appMenu.val(topMenu.id).change();
+      $styleMenu.val(topMenu.style).change();
     });
 
   // Listeners
@@ -144,6 +146,11 @@
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   });
 
+  $styleMenu.on('change', function () {
+    var selectedText = $(this).find('option:selected').text();
+    $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
+  });
+
   Fliplet.Widget.onSaveRequest(function () {
     var tab = $('#menu-manager-control').hasClass('active') ? 'manager' : 'settings';
     switch(tab) {
@@ -158,6 +165,9 @@
 
   function saveSettings() {
     topMenu.id = $appMenu.val();
+    topMenu.style = $styleMenu.val();
+    topMenu.template = $("#style-" + topMenu.style).html();
+
     Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
       Fliplet.Studio.emit('reload-page-preview');
     });

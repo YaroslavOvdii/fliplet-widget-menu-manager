@@ -30,6 +30,21 @@
           </label>
         </div>
       </div>
+      <div class="form-group">
+        <div class="col-sm-4 control-label">
+          <label for="select-menu">Menu style</label>
+        </div>
+        <div class="col-sm-8">
+          <label for="style-menu" class="select-proxy-display">
+            <span class="icon fa fa-chevron-down"></span>
+            <span class="select-value-proxy">Default</span>
+
+            <select id="style-menu" class="hidden-select form-control">
+              <option value="default">Default</option>
+            </select>
+          </label>
+        </div>
+      </div>
     </div>
     <div role="tabpanel" class="tab-pane" id="menu-manager">
 
@@ -129,4 +144,50 @@
       </div>
     </div>
   </div>
+</template>
+
+<template id="style-default">
+  <!-- MENU -->
+  <div class="fl-viewport-header">
+    \{{#if topMenu.canGoBack}}
+    <span class="nav-left fl-menu-back">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i> <span class="btn-label">Back</span>
+    </span>
+    \{{/if}}
+    <span class="nav-title">
+        <span>\{{topMenu.title}}</span>
+    </span>
+    \{{#if topMenu.pages}}
+    <span class="nav-right fl-toggle-menu" data-target="#fl-app-menu" class="nav-right"><i class="fa fa-bars" aria-hidden="true"></i></span>
+    \{{/if}}
+  </div>
+  <!-- END OF MENU -->
+
+  \{{#if topMenu.pages}}
+  <!-- MENU OVERLAY -->
+  <div class="fl-menu" id="fl-app-menu">
+    <div class="fl-menu-overlay"></div>
+    <div class="fl-menu-panel">
+      <div class="fl-menu-foot">
+        <div id="fl-app-menu-toolbar">
+          <div class="copyright">
+            Version \{{appVersion}} -
+            <a href="http://fliplet.com/">Built using Fliplet</a>
+          </div>
+        </div>
+      </div>
+      <div class="fl-menu-body has-no-logo">
+        <div class="fl-list-default">
+          <ul class="main-menu">
+            \{{#each topMenu.pages}}
+            <li class="linked" data-fl-navigate='{{{action}}}'><i class="fa fa-angle-right" aria-hidden="true"></i><span class="internal-link buttonControl">\{{label}}</span></li>
+            \{{/each}}
+          </ul>
+        </div>
+        <div id="fl-app-menu-logo"></div>
+      </div>
+    </div>
+  </div>
+  <!-- END OF MENU OVERLAY -->
+  \{{/if}}
 </template>
