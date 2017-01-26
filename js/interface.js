@@ -30,6 +30,7 @@
       dataSources.forEach(function (dataSource) {
         addMenu(dataSource);
       });
+      $('#select-menu').change().prop('disabled', '');
 
       $appMenu.val(topMenu.id).change().prop('disabled', '');
       $styleMenu.val(topMenu.style).change().prop('disabled', '');
@@ -163,10 +164,9 @@
     topMenu.template = $("#style-" + topMenu.style).html();
 
     Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
+      showSuccessMessage();
       Fliplet.Studio.emit('reload-page-preview');
     });
-
-    showSuccessMessage();
   }
 
   function saveManager() {
