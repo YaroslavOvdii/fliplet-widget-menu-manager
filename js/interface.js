@@ -31,8 +31,8 @@
         addMenu(dataSource);
       });
 
-      $appMenu.val(topMenu.id).change();
-      $styleMenu.val(topMenu.style).change();
+      $appMenu.val(topMenu.id).change().prop('disabled', '');
+      $styleMenu.val(topMenu.style).change().prop('disabled', '');
     });
 
   // Listeners
