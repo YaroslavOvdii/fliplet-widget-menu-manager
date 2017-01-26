@@ -196,10 +196,6 @@ label {
   text-overflow: ellipsis;
 }
 
-.select-proxy-display > .hidden-select[disabled] ~ .select-value-proxy {
-  background: #e4e9eb;
-}
-
 .select-proxy-display > .icon {
   position: absolute;
   width: 44px;
@@ -214,6 +210,14 @@ label {
   border-top-right-radius: 6px;
   border-bottom-right-radius: 6px;
   border-left: 1px solid #e4e9eb;
+}
+
+.select-proxy-display > .hidden-select[disabled] ~ .icon {
+  background-color: #aaa;
+}
+
+.select-proxy-display > .hidden-select[disabled] ~ .select-value-proxy {
+  background: #e4e9eb;
 }
 
 .text-helper {
