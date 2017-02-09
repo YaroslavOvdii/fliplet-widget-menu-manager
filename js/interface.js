@@ -209,6 +209,11 @@
         .then(function (source) {
           return source.replaceWith(entries);
         })
+    }).then(function () {
+      // Reload the screen when we make changes to the current menu and save
+      if ($appMenu.val() == currentDataSource.id) {
+        Fliplet.Studio.emit('reload-page-preview');
+      }
     });
 
     menusPromises[currentDataSource.id].forEach(function (linkActionProvider) {
