@@ -170,71 +170,52 @@
     });
   }
 
+  var customMenus = [];
   function loadCustomMenus() {
     return fetchCustomMenus().then(function (menus) {
+      customMenus = menus;
       $customMenus.html('');
-
-      var hasCustomMenu = _.find(menus, function (menu) {
-        return !!menu.instances.length;
-      })
-
-      menus.unshift({
-        instances: [],
-        name: 'Default',
-        isCurrent: !hasCustomMenu
-      });
 
       menus.forEach(function (menu) {
         $customMenus.append(templates.menuWidget({
           widgetId: menu.id,
-          isCurrent: menu.isCurrent || !!menu.instances.length,
           instanceId: menu.instances.length ? menu.instances[0].id : null,
-          name: menu.name
+          name: menu.name,
+          icon: menu.icon
         }));
       });
     })
   }
 
+  // Load menus on startup
   loadCustomMenus();
 
+  // Handler to change the menu
   $('body').on('click', '[data-widget-id]', function (event) {
     event.preventDefault();
     var $el = $(this);
-    var $li = $el.closest('li');
     var widgetId = $el.data('widget-id');
 
-    var $currentMenu = $li.parent().find('> .current');
-
-    var cleanup = !$currentMenu.length
-      ? Promise.resolve()
-      : (function () {
-          var id = $currentMenu.find('[data-widget-instance-id]').data('widget-instance-id');
-
-          if (!id) {
-            return Promise.resolve(); // default menu
-          }
-
-          return Fliplet.API.request({
-            method: 'DELETE',
-            url: 'v1/widget-instances/' + id
-          });
-        })();
-
-    cleanup.then(function () {
-      if (!widgetId) {
-        return Promise.resolve(); // user selected the default menu
-      }
-
+    // First, remove any existing menu widgetInstance
+    Promise.all(customMenus.map(function (menu) {
+      return Promise.all(menu.instances.map(function (instance) {
+        return Fliplet.API.request({
+          method: 'DELETE',
+          url: 'v1/widget-instances/' + instance.id
+        });
+      }));
+    })).then(function () {
+      // Then, create the new instance
       return Fliplet.API.request({
         method: 'POST',
         url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
         data: {
-          widgetId: $el.data('widget-id')
+          widgetId: widgetId
         }
       });
     }).then(function () {
       Fliplet.Studio.emit('reload-page-preview');
-      loadCustomMenus()
+      return loadCustomMenus();
     });
   });
 

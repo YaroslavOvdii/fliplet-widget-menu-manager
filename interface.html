@@ -31,8 +31,10 @@
         </div>
       </div>
       <hr />
-      <p>Custom menu</p>
-      <ul class="custom-menus"></ul>
+      <h3>Custom menu</h3>
+      <ul class="custom-menus">
+        <li>Loading... Please wait.</li>
+      </ul>
     </div>
     <div role="tabpanel" class="tab-pane" id="menu-manager">
 
@@ -104,9 +106,9 @@
 </template>
 
 <template id="template-menuWidget">
-  <li class="\{{#if isCurrent}}current\{{/if}}">
+  <li class="\{{#if instanceId}}current\{{/if}}">
     <a data-widget-id="\{{widgetId}}" data-widget-instance-id="\{{instanceId}}" href="#">
-      \{{name}}
+      <img src="\{{icon}}" width=20 height=20/> \{{name}}
     </a>
   </li>
 </template>
