@@ -344,3 +344,7 @@ label {
 #success-alert.saved {
     opacity: 1;
 }
+
+.custom-menus li.current {
+    font-weight: bold;
+}

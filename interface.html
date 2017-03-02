@@ -30,6 +30,9 @@
           </label>
         </div>
       </div>
+      <hr />
+      <p>Custom menu</p>
+      <ul class="custom-menus"></ul>
     </div>
     <div role="tabpanel" class="tab-pane" id="menu-manager">
 
@@ -98,6 +101,14 @@
 <template id="template-menu">
   <div class="menu" id="menu-\{{id}}" style="display: none">
   </div>
+</template>
+
+<template id="template-menuWidget">
+  <li class="\{{#if isCurrent}}current\{{/if}}">
+    <a data-widget-id="\{{widgetId}}" data-widget-instance-id="\{{instanceId}}" href="#">
+      \{{name}}
+    </a>
+  </li>
 </template>
 
 <template id="template-menuLink">
