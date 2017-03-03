@@ -1,5 +1,3 @@
-window.ENV.appId = 11;
-
 (function () {
   var templates = {
     menuOption: template('menuOption'),
