@@ -1,3 +1,5 @@
+window.ENV.appId = 11;
+
 (function () {
   var templates = {
     menuOption: template('menuOption'),
@@ -48,7 +50,7 @@
         $('#select-menu').val(dataSource.id).change();
         $("#panel-holder").show();
         $("#initial-holder").hide();
-      })
+      });
   });
 
   $('#add-link').on('click', function () {
@@ -132,7 +134,7 @@
       Fliplet.DataSources.connect(menuId)
         .then(function (source) {
           currentDataSource = source;
-        })
+        });
     }
   });
 
@@ -172,6 +174,7 @@
 
   var customMenus = [];
   function loadCustomMenus() {
+    $('.menu-styles-wrapper').addClass('loading');
     return fetchCustomMenus().then(function (menus) {
       customMenus = menus;
       $customMenus.html('');
@@ -184,7 +187,9 @@
           icon: menu.icon
         }));
       });
-    })
+
+      $('.menu-styles-wrapper').removeClass('loading');
+    });
   }
 
   // Load menus on startup
@@ -193,6 +198,7 @@
   // Handler to change the menu
   $('body').on('click', '[data-widget-id]', function (event) {
     event.preventDefault();
+    $('.menu-styles-wrapper').addClass('loading');
     var $el = $(this);
     var widgetId = $el.data('widget-id');
 
@@ -271,7 +277,7 @@
       return Fliplet.DataSources.connect(currentDataSource.id)
         .then(function (source) {
           return source.replaceWith(entries);
-        })
+        });
     }).then(function () {
       // Reload the screen when we make changes to the current menu and save
       if ($appMenu.val() == currentDataSource.id) {

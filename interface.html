@@ -30,11 +30,18 @@
           </label>
         </div>
       </div>
+      <h2><small>Menu styles</small></h2>
+      <p>Select a menu style for your app.</p>
       <hr />
-      <h3>Custom menu</h3>
-      <ul class="custom-menus">
-        <li>Loading... Please wait.</li>
-      </ul>
+      <div class="menu-styles-wrapper">
+        <div class="instance-loading">
+          <div class="spinner-holder animated">
+            <div class="spinner-overlay">Loading...</div>
+            <p>Loading...</p>
+          </div>
+        </div>
+        <div class="custom-menus clearfix"></div>
+      </div>
     </div>
     <div role="tabpanel" class="tab-pane" id="menu-manager">
 
@@ -105,13 +112,24 @@
   </div>
 </template>
 
-<template id="template-menuWidget">
-  <li class="\{{#if instanceId}}current\{{/if}}">
-    <a data-widget-id="\{{widgetId}}" data-widget-instance-id="\{{instanceId}}" href="#">
-      <img src="\{{icon}}" width=20 height=20/> \{{name}}
-    </a>
-  </li>
-</template>
+<script id="template-menuWidget" type="text/template">
+  <div class="col-xs-4 menu-style-holder" data-widget-id="\{{widgetId}}" data-widget-instance-id="\{{instanceId}}">
+    <input type="radio" id="menu_id_\{{instanceId}}" name="menu-style-radios" \{{#if instanceId}}checked\{{/if}}>
+    <label for="menu_id_\{{instanceId}}">
+      <div class="menu-icon">
+        \{{#if icon}}
+        <div class="icon" style="background-image:url('\{{icon}}')"></div>
+        \{{/if}}
+        <div class="menu-screen">
+          <i class="fa fa-check"></i>
+        </div>
+      </div>
+      <div class="menu-name">
+        <p>\{{name}}</p>
+      </div>
+    </label>
+  </div>
+</script>
 
 <template id="template-menuLink">
   <div class="panel panel-default" data-id="\{{id}}">
