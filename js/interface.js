@@ -2,13 +2,15 @@
   var templates = {
     menuOption: template('menuOption'),
     menuLink: template('menuLink'),
-    menu: template('menu')
+    menu: template('menu'),
+    menuWidget: template('menuWidget')
   };
 
   var appId = Fliplet.Env.get('appId');
 
   var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages' };
   var $appMenu = $('#app-menu');
+  var $customMenus = $('.custom-menus');
 
   var currentDataSource;
 
@@ -46,7 +48,7 @@
         $('#select-menu').val(dataSource.id).change();
         $("#panel-holder").show();
         $("#initial-holder").hide();
-      })
+      });
   });
 
   $('#add-link').on('click', function () {
@@ -130,7 +132,7 @@
       Fliplet.DataSources.connect(menuId)
         .then(function (source) {
           currentDataSource = source;
-        })
+        });
     }
   });
 
@@ -154,6 +156,71 @@
         saveSettings();
         break;
     }
+  });
+
+  function fetchCustomMenus() {
+    return Fliplet.API.request({
+      url: [
+        'v1/widgets?include_instances=true&tags=type:menu',
+        '&appId=' + Fliplet.Env.get('appId'),
+        '&organizationId=' + (Fliplet.Env.get('organizationId') || '')
+      ].join('')
+    }).then(function (response) {
+      return Promise.resolve(response.widgets);
+    });
+  }
+
+  var customMenus = [];
+  function loadCustomMenus() {
+    $('.menu-styles-wrapper').addClass('loading');
+    return fetchCustomMenus().then(function (menus) {
+      customMenus = menus;
+      $customMenus.html('');
+
+      menus.forEach(function (menu) {
+        $customMenus.append(templates.menuWidget({
+          widgetId: menu.id,
+          instanceId: menu.instances.length ? menu.instances[0].id : null,
+          name: menu.name,
+          icon: menu.icon
+        }));
+      });
+
+      $('.menu-styles-wrapper').removeClass('loading');
+    });
+  }
+
+  // Load menus on startup
+  loadCustomMenus();
+
+  // Handler to change the menu
+  $('body').on('click', '[data-widget-id]', function (event) {
+    event.preventDefault();
+    $('.menu-styles-wrapper').addClass('loading');
+    var $el = $(this);
+    var widgetId = $el.data('widget-id');
+
+    // First, remove any existing menu widgetInstance
+    Promise.all(customMenus.map(function (menu) {
+      return Promise.all(menu.instances.map(function (instance) {
+        return Fliplet.API.request({
+          method: 'DELETE',
+          url: 'v1/widget-instances/' + instance.id
+        });
+      }));
+    })).then(function () {
+      // Then, create the new instance
+      return Fliplet.API.request({
+        method: 'POST',
+        url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
+        data: {
+          widgetId: widgetId
+        }
+      });
+    }).then(function () {
+      Fliplet.Studio.emit('reload-page-preview');
+      return loadCustomMenus();
+    });
   });
 
   function saveSettings() {
@@ -208,7 +275,7 @@
       return Fliplet.DataSources.connect(currentDataSource.id)
         .then(function (source) {
           return source.replaceWith(entries);
-        })
+        });
     }).then(function () {
       // Reload the screen when we make changes to the current menu and save
       if ($appMenu.val() == currentDataSource.id) {
