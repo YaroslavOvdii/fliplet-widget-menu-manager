@@ -352,6 +352,9 @@ label {
 }
 
 .custom-menus {
+    display: flex;
+    justify-content: flex-start;
+    flex-flow: wrap;
     opacity: 1;
     -webkit-transition: opacity 1s ease;
     transition: opacity 1s ease;
