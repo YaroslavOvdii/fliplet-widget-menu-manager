@@ -146,6 +146,10 @@
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   });
 
+  $('header a').on('click', function() {
+    alert('During beta, please use live chat and let us know what you need help with.');
+  });
+
   Fliplet.Widget.onSaveRequest(function () {
     var tab = $('#menu-manager-control').hasClass('active') ? 'manager' : 'settings';
     switch(tab) {
