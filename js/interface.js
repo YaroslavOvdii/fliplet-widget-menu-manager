@@ -160,6 +160,7 @@
         saveSettings();
         break;
     }
+    Fliplet.Studio.emit('reload-page-preview');
   });
 
   function fetchCustomMenus() {
