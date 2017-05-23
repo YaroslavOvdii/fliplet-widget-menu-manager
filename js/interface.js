@@ -13,6 +13,8 @@
   var $customMenus = $('.custom-menus');
 
   var currentDataSource;
+  var currentMenu;
+  var currentProvider;
 
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
@@ -101,6 +103,23 @@
       $('.tab-content').trigger('scroll');
     });
 
+  $('[data-settings]').click(function (event) {
+    event.preventDefault();
+
+    console.log('>>', currentMenu)
+
+    if (!currentMenu) {
+      return;
+    }
+
+    currentProvider = Fliplet.Widget.open(currentMenu.id);
+
+    currentProvider.then(function () {
+      currentProvider = null;
+      Fliplet.Studio.emit('reload-page-preview');
+    });
+  });
+
   $('#select-menu').on('change', function onMenuChange() {
     updateSelectMenuText();
 
@@ -151,6 +170,10 @@
   });
 
   Fliplet.Widget.onSaveRequest(function () {
+    if (currentProvider) {
+      return currentProvider.forwardSaveRequest();
+    }
+
     var tab = $('#menu-manager-control').hasClass('active') ? 'manager' : 'settings';
     switch(tab) {
       case 'manager':
@@ -176,6 +199,7 @@
   }
 
   var customMenus = [];
+
   function loadCustomMenus() {
     $('.menu-styles-wrapper').addClass('loading');
     return fetchCustomMenus().then(function (menus) {
@@ -183,6 +207,11 @@
       $customMenus.html('');
 
       menus.forEach(function (menu) {
+        if (menu.instances.length) {
+          currentMenu = menu.instances[0];
+          $('[data-settings]').removeClass('hidden');
+        }
+
         $customMenus.append(templates.menuWidget({
           widgetId: menu.id,
           instanceId: menu.instances.length ? menu.instances[0].id : null,
