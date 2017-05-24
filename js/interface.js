@@ -106,8 +106,6 @@
   $('[data-settings]').click(function (event) {
     event.preventDefault();
 
-    console.log('>>', currentMenu)
-
     if (!currentMenu) {
       return;
     }
@@ -209,7 +207,10 @@
       menus.forEach(function (menu) {
         if (menu.instances.length) {
           currentMenu = menu.instances[0];
-          $('[data-settings]').removeClass('hidden');
+
+          if (menu.hasInterface) {
+            $('[data-settings]').removeClass('hidden');
+          }
         }
 
         $customMenus.append(templates.menuWidget({
