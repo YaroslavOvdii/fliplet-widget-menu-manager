@@ -42,8 +42,6 @@
         </div>
         <div class="custom-menus clearfix"></div>
       </div>
-      <hr />
-      <a href="#" data-settings class="hidden">Menu settings</a>
     </div>
     <div role="tabpanel" class="tab-pane" id="menu-manager">
 
@@ -114,9 +112,9 @@
 </template>
 
 <script id="template-menuWidget" type="text/template">
-  <div class="col-xs-4 menu-style-holder" data-widget-id="\{{widgetId}}" data-widget-instance-id="\{{instanceId}}">
+  <div class="col-xs-4 menu-style-holder" data-widget-instance-id="\{{instanceId}}">
     <input type="radio" id="menu_id_\{{instanceId}}" name="menu-style-radios" \{{#if instanceId}}checked\{{/if}}>
-    <label for="menu_id_\{{instanceId}}">
+    <label for="menu_id_\{{instanceId}}" data-widget-id="\{{widgetId}}">
       <div class="menu-icon">
         \{{#if icon}}
         <div class="icon" style="background-image:url('\{{icon}}')"></div>
@@ -129,6 +127,9 @@
         <p>\{{name}}</p>
       </div>
     </label>
+    <div class="settings-holder">
+      <a href="#" data-settings>Settings <i class="fa fa-cog" aria-hidden="true"></i></a>
+    </div>
   </div>
 </script>
 
