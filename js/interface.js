@@ -222,9 +222,10 @@
   // Handler to change the menu
   $('body').on('click', '[data-widget-id]', function(event) {
       event.preventDefault();
-      $('.menu-styles-wrapper').addClass('loading');
       var $el = $(this);
       var widgetId = $el.data('widget-id');
+      $('.menu-styles-wrapper').addClass('loading');
+      $('.radio_' + widgetId).prop('checked', true);
 
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {

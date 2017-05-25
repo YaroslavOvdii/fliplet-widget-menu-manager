@@ -15,6 +15,11 @@ body {
   border: none;
 }
 
+.btn.disabled,
+.btn[disabled] {
+  pointer-events: none;
+}
+
 .btn-default {
   color: #333;
   background-color: #e4e9eb;
@@ -64,6 +69,36 @@ body {
   background-color: #c9302c;
   border-color: #c9302c;
   outline: none;
+}
+
+.btn-secondary,
+.btn-secondary.active,
+.btn-secondary.focus,
+.btn-secondary:active,
+.btn-secondary:focus,
+.btn-secondary:hover {
+  color: #00abd1;
+  background-color: transparent;
+}
+
+.btn-secondary {
+  border-bottom-color: #00abd1;
+  border-color: #00abd1;
+  border-width: 1px;
+  border-style: solid;
+  padding: 5px 10px;
+  line-height: normal;
+}
+
+.btn-secondary.focus,
+.btn-secondary:focus {
+  border-bottom-color: #004352;
+}
+
+.btn-secondary.active,
+.btn-secondary:active,
+.btn-secondary:hover {
+  border-bottom-color: #007994;
 }
 
 .btn-link,
@@ -412,7 +447,7 @@ label {
   background-size: cover;
   background-image: url('../img/icon.png');
   overflow: hidden;
-  cursor: pointer;
+  margin-bottom: 10px;
 }
 
 .menu-icon > .icon {
@@ -450,7 +485,7 @@ label {
 }
 
 .menu-name {
-  margin-top: 5px;
+  margin-bottom: 5px;
   word-break: break-word;
 }
 
@@ -459,58 +494,38 @@ label {
 }
 
 .menu-style-holder:hover .menu-icon {
-  border-color: #00abd2;
+  outline: 3px solid #808080;
 }
 
-.menu-style-holder:hover .menu-name {
-  color: #00abd2;
+.menu-style-holder input[type="radio"]:checked + .icon-holder .menu-icon {
+  outline: 3px solid #00abd2;
 }
 
-.menu-style-holder input[type="radio"]:checked + label .menu-icon {
-  border-color: #00abd2;
-}
-
-.menu-style-holder input[type="radio"]:checked + label .menu-screen {
+.menu-style-holder input[type="radio"]:checked + .icon-holder .menu-screen {
   display: block;
 }
 
-.menu-style-holder input[type="radio"]:checked + label .menu-name {
-  color: #00abd2;
+.menu-style-holder:hover:hover .btn-secondary {
+  color: #fff;
+  background-color: #00abd1;
+  border-bottom-color: #006c85;
+}
+
+.select-style {
+  margin-bottom: 0;
 }
 
 .settings-holder {
   display: none;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  font-size: 12px;
-  background: rgba(0, 171, 210, 0.55);
-  border-top: 1px solid #ffffff;
-  pointer-events: all;
-  cursor: pointer;
-  z-index: 1;
+  text-align: center;
 }
 
-.settings-holder:hover {
-  background: rgba(0, 171, 210, 0.33);
-}
-
-.settings-holder a,
-.settings-holder a:active,
-.settings-holder a:active:focus,
-.settings-holder a:active:hover,
-.settings-holder a:focus,
-.settings-holder a:hover {
-  text-decoration: none;
-  color: #14505e;
+.menu-style-holder input[type="radio"]:checked ~ .settings-holder {
   display: block;
-  line-height: 25px;
-  width: 100%;
 }
 
-.menu-style-holder input[type="radio"]:checked + label .settings-holder {
-  display: block;
+.menu-style-holder input[type="radio"]:checked ~ .select-style {
+  display: none;
 }
 /* LOADER */
 .instance-loading {

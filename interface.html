@@ -112,26 +112,29 @@
 </template>
 
 <script id="template-menuWidget" type="text/template">
-  <div class="col-xs-4 menu-style-holder" data-widget-instance-id="\{{instanceId}}">
-    <input type="radio" id="menu_id_\{{instanceId}}" name="menu-style-radios" \{{#if instanceId}}checked\{{/if}}>
-    <label for="menu_id_\{{instanceId}}">
+  <div class="col-xs-6 menu-style-holder" data-widget-instance-id="\{{instanceId}}">
+    <div class="menu-name">
+      <p>\{{name}}</p>
+    </div>
+    <input type="radio" id="menu_id_\{{instanceId}}" name="menu-style-radios radio_\{{widgetId}}" \{{#if instanceId}}checked\{{/if}}>
+    <div class="icon-holder">
       <div class="menu-icon">
         \{{#if icon}}
-        <div data-widget-id="\{{widgetId}}" class="icon" style="background-image:url('\{{icon}}')"></div>
-        \{{/if}}
-        \{{#if settings}}
-        <div class="settings-holder">
-          <a href="#" data-settings>Settings <i class="fa fa-cog" aria-hidden="true"></i></a>
-        </div>
+        <div class="icon" style="background-image:url('\{{icon}}')"></div>
         \{{/if}}
         <div class="menu-screen">
           <i class="fa fa-check"></i>
         </div>
       </div>
-      <div class="menu-name">
-        <p>\{{name}}</p>
-      </div>
-    </label>
+    </div>
+    <p class="text-center select-style">
+      <a href="#" class="btn btn-sm btn-secondary" data-widget-id="\{{widgetId}}">Change style</a>
+    </p>
+    \{{#if settings}}
+    <div class="settings-holder">
+      <a href="#" class="btn btn-sm btn-secondary" data-settings>Settings <i class="fa fa-cog" aria-hidden="true"></i></a>
+    </div>
+    \{{/if}}
   </div>
 </script>
 
