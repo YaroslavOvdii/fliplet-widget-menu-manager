@@ -1,4 +1,4 @@
-(function () {
+(function() {
   var templates = {
     menuOption: template('menuOption'),
     menuLink: template('menuLink'),
@@ -8,7 +8,9 @@
 
   var appId = Fliplet.Env.get('appId');
 
-  var topMenu = Fliplet.App.Settings.get('topMenu') || { id: 'pages' };
+  var topMenu = Fliplet.App.Settings.get('topMenu') || {
+    id: 'pages'
+  };
   var $appMenu = $('#app-menu');
   var $customMenus = $('.custom-menus');
 
@@ -22,15 +24,18 @@
 
   var menusPromises = {};
 
-  Fliplet.DataSources.get({ type: 'menu', appId: appId, })
-    .then(function (dataSources) {
+  Fliplet.DataSources.get({
+      type: 'menu',
+      appId: appId,
+    })
+    .then(function(dataSources) {
       if (dataSources.length === 0) {
         $("#initial-holder").show();
       } else {
         $("#panel-holder").show();
       }
 
-      dataSources.forEach(function (dataSource) {
+      dataSources.forEach(function(dataSource) {
         addMenu(dataSource);
       });
 
@@ -38,14 +43,14 @@
     });
 
   // Listeners
-  $('.add-menu').on('click', function () {
+  $('.add-menu').on('click', function() {
     var data = {
       appId: appId,
       name: 'Untitled menu',
       type: 'menu'
     };
     Fliplet.DataSources.create(data)
-      .then(function (dataSource) {
+      .then(function(dataSource) {
         addMenu(dataSource);
         $('#select-menu').val(dataSource.id).change();
         $("#panel-holder").show();
@@ -53,16 +58,16 @@
       });
   });
 
-  $('#add-link').on('click', function () {
+  $('#add-link').on('click', function() {
     addLink(currentDataSource.id);
   });
 
-  $('#delete-menu').on('click', function () {
+  $('#delete-menu').on('click', function() {
     var menuId = getSelectedMenuId();
     Fliplet.DataSources.delete(menuId);
     delete(menusPromises[menuId]);
-    $("#select-menu option[value='"+menuId+"']").remove();
-    $appMenu.find("option[value='"+menuId+"']").remove();
+    $("#select-menu option[value='" + menuId + "']").remove();
+    $appMenu.find("option[value='" + menuId + "']").remove();
     $('#select-menu').val(0).change();
     if ($.isEmptyObject(menusPromises)) {
       $('#panel-holder').hide();
@@ -79,7 +84,7 @@
   $("#accordion")
     .on('click', '.icon-delete', function() {
       var $item = $(this).closest("[data-id], .panel"),
-          id = $item.data('id');
+        id = $item.data('id');
 
       $item.remove();
 
@@ -102,23 +107,6 @@
     .on('shown.bs.collapse hidden.bs.collapse', '.panel-collapse', function() {
       $('.tab-content').trigger('scroll');
     });
-
-  $('[data-settings]').click(function (event) {
-    event.preventDefault();
-
-    console.log('>>', currentMenu)
-
-    if (!currentMenu) {
-      return;
-    }
-
-    currentProvider = Fliplet.Widget.open(currentMenu.id);
-
-    currentProvider.then(function () {
-      currentProvider = null;
-      Fliplet.Studio.emit('reload-page-preview');
-    });
-  });
 
   $('#select-menu').on('change', function onMenuChange() {
     updateSelectMenuText();
@@ -149,7 +137,7 @@
       $('#save').show();
       $('#menu-links').show();
       Fliplet.DataSources.connect(menuId)
-        .then(function (source) {
+        .then(function(source) {
           currentDataSource = source;
         });
     }
@@ -160,7 +148,7 @@
     $('#menu-manager-control').addClass('active');
   });
 
-  $appMenu.on('change', function () {
+  $appMenu.on('change', function() {
     var selectedText = $(this).find('option:selected').text();
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   });
@@ -169,13 +157,13 @@
     alert('During beta, please use live chat and let us know what you need help with.');
   });
 
-  Fliplet.Widget.onSaveRequest(function () {
+  Fliplet.Widget.onSaveRequest(function() {
     if (currentProvider) {
       return currentProvider.forwardSaveRequest();
     }
 
     var tab = $('#menu-manager-control').hasClass('active') ? 'manager' : 'settings';
-    switch(tab) {
+    switch (tab) {
       case 'manager':
         saveManager();
         break;
@@ -193,7 +181,7 @@
         '&appId=' + Fliplet.Env.get('appId'),
         '&organizationId=' + (Fliplet.Env.get('organizationId') || '')
       ].join('')
-    }).then(function (response) {
+    }).then(function(response) {
       return Promise.resolve(response.widgets);
     });
   }
@@ -202,14 +190,17 @@
 
   function loadCustomMenus() {
     $('.menu-styles-wrapper').addClass('loading');
-    return fetchCustomMenus().then(function (menus) {
+    return fetchCustomMenus().then(function(menus) {
       customMenus = menus;
       $customMenus.html('');
 
-      menus.forEach(function (menu) {
+      menus.forEach(function(menu) {
         if (menu.instances.length) {
           currentMenu = menu.instances[0];
-          $('[data-settings]').removeClass('hidden');
+
+          if (menu.hasInterface) {
+            $('[data-settings]').removeClass('hidden');
+          }
         }
 
         $customMenus.append(templates.menuWidget({
@@ -228,38 +219,54 @@
   loadCustomMenus();
 
   // Handler to change the menu
-  $('body').on('click', '[data-widget-id]', function (event) {
-    event.preventDefault();
-    $('.menu-styles-wrapper').addClass('loading');
-    var $el = $(this);
-    var widgetId = $el.data('widget-id');
+  $('body').on('click', '[data-widget-id]', function(event) {
+      event.preventDefault();
+      $('.menu-styles-wrapper').addClass('loading');
+      var $el = $(this);
+      var widgetId = $el.data('widget-id');
 
-    // First, remove any existing menu widgetInstance
-    Promise.all(customMenus.map(function (menu) {
-      return Promise.all(menu.instances.map(function (instance) {
+      // First, remove any existing menu widgetInstance
+      Promise.all(customMenus.map(function(menu) {
+        return Promise.all(menu.instances.map(function(instance) {
+          return Fliplet.API.request({
+            method: 'DELETE',
+            url: 'v1/widget-instances/' + instance.id
+          });
+        }));
+      })).then(function() {
+        // Then, create the new instance
         return Fliplet.API.request({
-          method: 'DELETE',
-          url: 'v1/widget-instances/' + instance.id
+          method: 'POST',
+          url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
+          data: {
+            widgetId: widgetId
+          }
         });
-      }));
-    })).then(function () {
-      // Then, create the new instance
-      return Fliplet.API.request({
-        method: 'POST',
-        url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
-        data: {
-          widgetId: widgetId
-        }
+      }).then(function() {
+        Fliplet.Studio.emit('reload-page-preview');
+        return loadCustomMenus();
       });
-    }).then(function () {
-      Fliplet.Studio.emit('reload-page-preview');
-      return loadCustomMenus();
+    })
+    .on('click', '[data-settings]', function(event) {
+      event.preventDefault();
+
+      if (!currentMenu) {
+        return;
+      }
+
+      currentProvider = Fliplet.Widget.open(currentMenu.id);
+
+      currentProvider.then(function() {
+        currentProvider = null;
+        Fliplet.Studio.emit('reload-page-preview');
+      });
     });
-  });
 
   function saveSettings() {
     topMenu.id = $appMenu.val();
-    Fliplet.App.Settings.set({ topMenu: topMenu }).then(function () {
+    Fliplet.App.Settings.set({
+      topMenu: topMenu
+    }).then(function() {
       Fliplet.Studio.emit('reload-page-preview');
     });
 
@@ -286,38 +293,40 @@
       };
 
       Fliplet.DataSources.update(updateOptions)
-        .then(function () {
+        .then(function() {
           $('#select-menu option:selected').text(newMenuName);
         });
     }
 
     // Get order of links
-    var sortedIds = $('#menu-' + currentDataSource.id).sortable("toArray" ,{attribute: 'data-id'});
+    var sortedIds = $('#menu-' + currentDataSource.id).sortable("toArray", {
+      attribute: 'data-id'
+    });
 
     // Update Links
-    Promise.all(menusPromises[currentDataSource.id].map(function (provider) {
+    Promise.all(menusPromises[currentDataSource.id].map(function(provider) {
       // Do stuff in here with result from provider
-      return new Promise(function (resolve, reject) {
-        provider.then(function (result) {
+      return new Promise(function(resolve, reject) {
+        provider.then(function(result) {
           provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
           provider.row.data.linkLabel = $('[data-id="' + provider.row.id + '"]').find('.link-label').val();
           provider.row.data.action = result.data;
           resolve(provider.row.data);
         });
       });
-    })).then(function (entries) {
+    })).then(function(entries) {
       return Fliplet.DataSources.connect(currentDataSource.id)
-        .then(function (source) {
+        .then(function(source) {
           return source.replaceWith(entries);
         });
-    }).then(function () {
+    }).then(function() {
       // Reload the screen when we make changes to the current menu and save
       if ($appMenu.val() == currentDataSource.id) {
         Fliplet.Studio.emit('reload-page-preview');
       }
     });
 
-    menusPromises[currentDataSource.id].forEach(function (linkActionProvider) {
+    menusPromises[currentDataSource.id].forEach(function(linkActionProvider) {
       linkActionProvider.forwardSaveRequest();
     });
 
@@ -326,7 +335,9 @@
 
   function showSuccessMessage() {
     $('#success-alert').addClass('saved');
-    setTimeout(function(){ $('#success-alert').removeClass('saved'); }, 2000);
+    setTimeout(function() {
+      $('#success-alert').removeClass('saved');
+    }, 2000);
   }
 
   // Helpers
@@ -338,16 +349,16 @@
     $appMenu.append(templates.menuOption(dataSource));
 
     Fliplet.DataSources.connect(dataSource.id)
-      .then(function (source) {
+      .then(function(source) {
         return source.find();
       })
-      .then(function (rows) {
+      .then(function(rows) {
         if (!rows || !rows.length) {
           return;
         }
 
         rows = _.sortBy(rows, 'data.order');
-        rows.forEach(function (row) {
+        rows.forEach(function(row) {
           addLink(dataSource.id, row);
         });
       });
@@ -373,18 +384,18 @@
 
     // Check if it's an existing link or a new one
     row = row || {
-        data: {
-          action: { },
-          linkLabel: 'Menu Link'
-        },
-        id: id
-      };
+      data: {
+        action: {},
+        linkLabel: 'Menu Link'
+      },
+      id: id
+    };
 
     $('#menu-' + dataSourceId).append(templates.menuLink(row));
 
     var linkActionProvider = Fliplet.Widget.open('com.fliplet.link', {
       closeOnSave: false,
-      selector: '[data-id='+ row.id +']  .link',
+      selector: '[data-id=' + row.id + ']  .link',
       data: row.data.action
     });
 
