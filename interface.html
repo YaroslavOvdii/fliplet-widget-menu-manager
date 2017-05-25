@@ -114,11 +114,14 @@
 <script id="template-menuWidget" type="text/template">
   <div class="col-xs-4 menu-style-holder" data-widget-instance-id="\{{instanceId}}">
     <input type="radio" id="menu_id_\{{instanceId}}" name="menu-style-radios" \{{#if instanceId}}checked\{{/if}}>
-    <label for="menu_id_\{{instanceId}}" data-widget-id="\{{widgetId}}">
+    <label for="menu_id_\{{instanceId}}">
       <div class="menu-icon">
         \{{#if icon}}
-        <div class="icon" style="background-image:url('\{{icon}}')"></div>
+        <div data-widget-id="\{{widgetId}}" class="icon" style="background-image:url('\{{icon}}')"></div>
         \{{/if}}
+        <div class="settings-holder">
+          <a href="#" data-settings>Settings <i class="fa fa-cog" aria-hidden="true"></i></a>
+        </div>
         <div class="menu-screen">
           <i class="fa fa-check"></i>
         </div>
@@ -127,9 +130,6 @@
         <p>\{{name}}</p>
       </div>
     </label>
-    <div class="settings-holder">
-      <a href="#" data-settings>Settings <i class="fa fa-cog" aria-hidden="true"></i></a>
-    </div>
   </div>
 </script>
 
