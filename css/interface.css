@@ -505,6 +505,10 @@ label {
   display: block;
 }
 
+.menu-style-holder .btn-secondary {
+  border-radius: 3px;
+}
+
 .menu-style-holder:hover:hover .btn-secondary {
   color: #fff;
   background-color: #00abd1;
