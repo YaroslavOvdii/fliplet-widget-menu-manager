@@ -207,7 +207,8 @@
           widgetId: menu.id,
           instanceId: menu.instances.length ? menu.instances[0].id : null,
           name: menu.name,
-          icon: menu.icon
+          icon: menu.icon,
+          settings: menu.hasInterface
         }));
       });
 

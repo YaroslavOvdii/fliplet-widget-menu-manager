@@ -119,9 +119,11 @@
         \{{#if icon}}
         <div data-widget-id="\{{widgetId}}" class="icon" style="background-image:url('\{{icon}}')"></div>
         \{{/if}}
+        \{{#if settings}}
         <div class="settings-holder">
           <a href="#" data-settings>Settings <i class="fa fa-cog" aria-hidden="true"></i></a>
         </div>
+        \{{/if}}
         <div class="menu-screen">
           <i class="fa fa-check"></i>
         </div>
