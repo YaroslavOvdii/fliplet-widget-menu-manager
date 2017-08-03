@@ -195,6 +195,10 @@
       $customMenus.html('');
 
       menus.forEach(function(menu) {
+        if (_.isEmpty(menu.settings)) {
+          return;
+        }
+
         if (menu.instances.length) {
           currentMenu = menu.instances[0];
 
