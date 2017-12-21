@@ -153,8 +153,12 @@
     $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   });
 
-  $('header a').on('click', function() {
+  $('header .betaAlert').on('click', function() {
     alert('During beta, please use live chat and let us know what you need help with.');
+  });
+
+  $('header .closeSideView').on('click', function() {
+    Fliplet.Studio.emit('navigate', { name: 'appEdit' });
   });
 
   Fliplet.Widget.onSaveRequest(function() {
