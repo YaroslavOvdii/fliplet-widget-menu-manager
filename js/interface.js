@@ -395,7 +395,11 @@
     // Check if it's an existing link or a new one
     row = row || {
       data: {
-        action: {},
+        action: {
+          action: 'screen',
+          page: '',
+          transition: 'slide.left'
+        },
         linkLabel: 'Menu Link'
       },
       id: id
