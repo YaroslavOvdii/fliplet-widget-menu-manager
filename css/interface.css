@@ -49,14 +49,13 @@ footer {
 
 .panel {
   opacity: 1;
-  -webkit-transform: translate3d(0, 0, 0) scale(1);
   -webkit-transition: opacity 100ms linear, -webkit-transform 100ms linear;
+  transition: opacity 100ms linear, -webkit-transform 100ms linear;
   background-color: #f2f6f7;
 }
 
 .panel.focus {
   opacity: 1;
-  -webkit-transform: translate3d(0, 0, 0) scale(1.03);
 }
 
 .panel-group .panel {
@@ -168,7 +167,7 @@ footer {
   margin: 0;
 }
 
-.form-horizontal.link iframe {
+.link iframe {
   border: 0;
   width: 100%;
   background-color: transparent;
