@@ -179,7 +179,6 @@
   });
 
   Fliplet.Widget.onCancelRequest(function() {
-    console.log(menusPromises)
     if (menusPromises) {
       for (var key in menusPromises) {
         // skip loop if the property is from prototype
@@ -190,12 +189,12 @@
           // skip loop if the property is from prototype
           if(!obj.hasOwnProperty(prop)) continue;
 
-          obj[prop].forwardCancelRequest()
+          obj[prop].forwardCancelRequest();
         }
       }
     }
-    if (!currentProvider) return;
-    currentProvider.forwardCancelRequest()
+    if (!currentProvider) { return; }
+    currentProvider.forwardCancelRequest();
   });
 
   function fetchCustomMenus() {
