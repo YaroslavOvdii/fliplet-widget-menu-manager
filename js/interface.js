@@ -178,6 +178,26 @@
     Fliplet.Studio.emit('reload-page-preview');
   });
 
+  Fliplet.Widget.onCancelRequest(function() {
+    console.log(menusPromises)
+    if (menusPromises) {
+      for (var key in menusPromises) {
+        // skip loop if the property is from prototype
+        if (!menusPromises.hasOwnProperty(key)) continue;
+
+        var obj = menusPromises[key];
+        for (var prop in obj) {
+          // skip loop if the property is from prototype
+          if(!obj.hasOwnProperty(prop)) continue;
+
+          obj[prop].forwardCancelRequest()
+        }
+      }
+    }
+    if (!currentProvider) return;
+    currentProvider.forwardCancelRequest()
+  });
+
   function fetchCustomMenus() {
     return Fliplet.API.request({
       url: [
