@@ -17,6 +17,7 @@
   var currentDataSource;
   var currentMenu;
   var currentProvider;
+  var currentMenuItems = [];
 
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
@@ -395,16 +396,79 @@
     $('#menu-' + dataSource.id).sortable({
       handle: ".panel-heading",
       cancel: ".icon-delete",
+      tolerance: 'pointer',
+      revert: 150,
+      placeholder: 'panel panel-default placeholder tile',
+      cursor: '-webkit-grabbing; -moz-grabbing;',
+      axis: 'y',
       start: function(event, ui) {
+        var itemId = $(ui.item).data('id');
+        var itemProvider = _.find(menusPromises[currentDataSource.id], function(provider) {
+          return provider.row.id === itemId;
+        });
+
+        saveManager();
+
+        // removes provider
+        itemProvider = null;
+        _.remove(menusPromises[currentDataSource.id], function(provider) {
+          return provider.row.id === itemId;
+        });
+
         $('.panel-collapse.in').collapse('hide');
         ui.item.addClass('focus').css('height', ui.helper.find('.panel-heading').outerHeight() + 2);
         $('.panel').not(ui.item).addClass('faded');
       },
       stop: function(event, ui) {
+        var itemId = $(ui.item).data('id');
+        var movedItem = _.find(currentMenuItems, function(item) {
+          return item.id === itemId;
+        });
+
+        // sets up new provider
+        $('[data-id="' + itemId + '"] .link').html('');
+        console.log(movedItem);
+        initLinkProvider(movedItem, currentDataSource.id);
+
         ui.item.removeClass('focus');
+
         $('.panel').not(ui.item).removeClass('faded');
+
+        saveManager();
+      },
+      sort: function(event, ui) {
+        $('#menu-' + dataSource.id).sortable('refresh');
       }
     });
+  }
+
+  function initLinkProvider(row, dataSourceId) {
+    row.data.action = row.data.action || {};
+    row.data.action.provId = row.id;
+
+    var linkActionProvider = Fliplet.Widget.open('com.fliplet.link', {
+      // If provided, the iframe will be appended here,
+      // otherwise will be displayed as a full-size iframe overlay
+      selector: '[data-id="' + row.id + '"] .link',
+      // Also send the data I have locally, so that
+      // the interface gets repopulated with the same stuff
+      data: row.data.action,
+      // Events fired from the provider
+      onEvent: function(event, data) {
+        if (event === 'interface-validate') {
+          Fliplet.Widget.toggleSaveButton(data.isValid === true);
+        }
+      },
+      closeOnSave: false
+    });
+
+    linkActionProvider.then(function(data) {
+      row.data.action = data && data.data.action !== 'none' ? data.data : null;
+      return Promise.resolve();
+    });
+
+    linkActionProvider.row = row;
+    menusPromises[dataSourceId].push(linkActionProvider);
   }
 
   function addLink(dataSourceId, row) {
@@ -424,16 +488,11 @@
       id: id
     };
 
+    currentMenuItems.push(row);
+
     $('#menu-' + dataSourceId).append(templates.menuLink(row));
 
-    var linkActionProvider = Fliplet.Widget.open('com.fliplet.link', {
-      closeOnSave: false,
-      selector: '[data-id=' + row.id + ']  .link',
-      data: row.data.action
-    });
-
-    linkActionProvider.row = row;
-    menusPromises[dataSourceId].push(linkActionProvider);
+    initLinkProvider(row, dataSourceId);
   }
 
   // Getters / Setters
