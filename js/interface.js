@@ -237,7 +237,7 @@
           name: menu.name,
           icon: menu.icon,
           settings: menu.hasInterface,
-          gifIcon: menu.baseAssetsUri + menu.settings.gifIcon
+          gifIcon: menu.settings.gifIcon ? menu.baseAssetsUri + menu.settings.gifIcon : undefined
         }));
       });
 

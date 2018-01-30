@@ -118,11 +118,11 @@
     <input type="radio" id="menu_id_\{{instanceId}}" name="menu-style-radios radio_\{{widgetId}}" \{{#if instanceId}}checked\{{/if}}>
     <div class="icon-holder">
       <div class="menu-icon">
-        \{{#if icon}}
-        <div class="icon" style="background-image:url('\{{icon}}')"></div>
-        \{{/if}}
         \{{#if gifIcon}}
         <div class="icon animated-icon" style="background-image:url('\{{gifIcon}}')"></div>
+        \{{/if}}
+        \{{#if icon}}
+        <div class="icon" style="background-image:url('\{{icon}}')"></div>
         \{{/if}}
         <div class="menu-screen">
           <i class="fa fa-check"></i>

@@ -313,7 +313,7 @@ footer {
   display: none;
 }
 
-.menu-style-holder:hover .icon {
+.menu-style-holder:hover .icon.animated-icon + .icon {
   display: none;
 }
 
