@@ -236,7 +236,8 @@
           instanceId: menu.instances.length ? menu.instances[0].id : null,
           name: menu.name,
           icon: menu.icon,
-          settings: menu.hasInterface
+          settings: menu.hasInterface,
+          gifIcon: menu.baseAssetsUri + menu.settings.gifIcon
         }));
       });
 

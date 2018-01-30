@@ -30,7 +30,8 @@
         </div>
       </div>
       <h2><small>Menu styles</small></h2>
-      <p>Select a menu style for your app.</p>
+      <p>Select a menu style for your app and check out each menu's settings for more variations.</p>
+      <p><small>Hover over each menu to see an animated representation.</small></p>
       <hr />
       <div class="menu-styles-wrapper">
         <div class="instance-loading">
@@ -119,6 +120,9 @@
       <div class="menu-icon">
         \{{#if icon}}
         <div class="icon" style="background-image:url('\{{icon}}')"></div>
+        \{{/if}}
+        \{{#if gifIcon}}
+        <div class="icon animated-icon" style="background-image:url('\{{gifIcon}}')"></div>
         \{{/if}}
         <div class="menu-screen">
           <i class="fa fa-check"></i>
