@@ -18,8 +18,13 @@ a.closeSideView:hover {
 }
 
 .btn.disabled,
-.btn[disabled] {
+.btn[disabled],
+a.disabled {
   pointer-events: none;
+}
+
+#menu-manager-link.disabled {
+  color: #333;
 }
 
 footer {
