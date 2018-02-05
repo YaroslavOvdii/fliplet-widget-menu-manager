@@ -280,7 +280,7 @@
             widgetId: widgetId
           }
         });
-      }).then(function(menu) {
+      }).then(function() {
         if (menuName === 'Swipe') {
           $('#app-menu').val('pages').trigger('change').prop('disabled', true);
           $('#menu-manager-control').addClass('disabled');
