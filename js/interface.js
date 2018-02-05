@@ -236,9 +236,16 @@
           instanceId: menu.instances.length ? menu.instances[0].id : null,
           name: menu.name,
           icon: menu.icon,
-          settings: menu.hasInterface
+          settings: menu.hasInterface,
+          gifIcon: menu.settings.gifIcon ? menu.baseAssetsUri + menu.settings.gifIcon : undefined
         }));
       });
+
+      if ($('.menu-style-radios:checked').data('menu-name') === 'Swipe') {
+        $('#app-menu').val('pages').trigger('change').prop('disabled', true);
+        $('#menu-manager-control').addClass('disabled');
+        $('#menu-manager-link').addClass('disabled');
+      }
 
       $('.menu-styles-wrapper').removeClass('loading');
     });
@@ -252,9 +259,10 @@
       event.preventDefault();
       var $el = $(this);
       var widgetId = $el.data('widget-id');
+      var menuName = $('.radio_' + widgetId).data('menu-name');
       $('.menu-styles-wrapper').addClass('loading');
       $('.radio_' + widgetId).prop('checked', true);
-
+      
       // First, remove any existing menu widgetInstance
       Promise.all(customMenus.map(function(menu) {
         return Promise.all(menu.instances.map(function(instance) {
@@ -273,6 +281,16 @@
           }
         });
       }).then(function() {
+        if (menuName === 'Swipe') {
+          $('#app-menu').val('pages').trigger('change').prop('disabled', true);
+          $('#menu-manager-control').addClass('disabled');
+          $('#menu-manager-link').addClass('disabled');
+          saveSettings();
+        } else {
+          $('#app-menu').prop('disabled', false);
+          $('#menu-manager-control').removeClass('disabled');
+          $('#menu-manager-link').removeClass('disabled');
+        }
         Fliplet.Studio.emit('reload-page-preview');
         return loadCustomMenus();
       });

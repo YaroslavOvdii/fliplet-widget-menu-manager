@@ -18,8 +18,13 @@ a.closeSideView:hover {
 }
 
 .btn.disabled,
-.btn[disabled] {
+.btn[disabled],
+a.disabled {
   pointer-events: none;
+}
+
+#menu-manager-link.disabled {
+  color: #333;
 }
 
 footer {
@@ -307,6 +312,18 @@ footer {
   color: #fff;
   background-color: #00abd1;
   border-bottom-color: #006c85;
+}
+
+.animated-icon {
+  display: none;
+}
+
+.menu-style-holder:hover .icon.animated-icon + .icon {
+  display: none;
+}
+
+.menu-style-holder:hover .icon.animated-icon {
+  display: block;
 }
 
 .select-style {
