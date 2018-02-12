@@ -241,12 +241,6 @@
         }));
       });
 
-      if ($('.menu-style-radios:checked').data('menu-name') === 'Swipe') {
-        $('#app-menu').val('pages').trigger('change').prop('disabled', true);
-        $('#menu-manager-control').addClass('disabled');
-        $('#menu-manager-link').addClass('disabled');
-      }
-
       $('.menu-styles-wrapper').removeClass('loading');
     });
   }
@@ -259,7 +253,6 @@
       event.preventDefault();
       var $el = $(this);
       var widgetId = $el.data('widget-id');
-      var menuName = $('.radio_' + widgetId).data('menu-name');
       $('.menu-styles-wrapper').addClass('loading');
       $('.radio_' + widgetId).prop('checked', true);
       
@@ -281,16 +274,6 @@
           }
         });
       }).then(function() {
-        if (menuName === 'Swipe') {
-          $('#app-menu').val('pages').trigger('change').prop('disabled', true);
-          $('#menu-manager-control').addClass('disabled');
-          $('#menu-manager-link').addClass('disabled');
-          saveSettings();
-        } else {
-          $('#app-menu').prop('disabled', false);
-          $('#menu-manager-control').removeClass('disabled');
-          $('#menu-manager-link').removeClass('disabled');
-        }
         Fliplet.Studio.emit('reload-page-preview');
         return loadCustomMenus();
       });
