@@ -8,8 +8,12 @@ body {
   overflow: hidden;
 }
 
+.widget-holder header {
+  font-size: 0.8em;
+}
+
 a.closeSideView {
-  color: #ababab;
+  color: #d2e0e4;
   margin-right: 5px;
 }
 
