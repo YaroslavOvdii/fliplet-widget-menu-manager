@@ -236,7 +236,7 @@
           instanceId: menu.instances.length ? menu.instances[0].id : null,
           name: menu.name,
           icon: menu.icon,
-          settings: menu.hasInterface,
+          settings: menu.settings && typeof menu.settings.showSettings !== 'undefined' ? menu.settings.showSettings : menu.hasInterface,
           gifIcon: menu.settings.gifIcon ? menu.baseAssetsUri + menu.settings.gifIcon : undefined
         }));
       });
@@ -291,7 +291,72 @@
         currentProvider = null;
         Fliplet.Studio.emit('reload-page-preview');
       });
+    })
+    .on('click', '[data-select-icon]', function() {
+      var itemId = $(this).parents('.panel').data('id');
+      var currentItem = _.find(currentMenuItems, function(item) {
+        return item.id === itemId;
+      });
+      initIconProvider(currentItem);
+    })
+    .on('click', '.remove-icon', function() {
+      var itemId = $(this).parents('.panel').data('id');
+      var currentItem = _.find(currentMenuItems, function(item) {
+        return item.id === itemId;
+      });
+      var iconBak = currentItem.data.icon;
+      currentItem.data.icon = undefined;
+      $(this).parents('.icon-selection').removeClass('icon-selected');
+      $(this).parents('.icon-selection').find('.selected-icon').removeClass(iconBak);
+      $(this).parents('.icon-selection').find('[data-select-icon]').text('Select an icon');
     });
+
+  function initIconProvider(row) {
+    row.data.icon = row.data.icon || '';
+
+    currentProvider = Fliplet.Widget.open('com.fliplet.icon-selector', {
+      // Also send the data I have locally, so that
+      // the interface gets repopulated with the same stuff
+      data: row.data,
+      // Events fired from the provider
+      onEvent: function(event, data) {
+        if (event === 'interface-validate') {
+          Fliplet.Widget.toggleSaveButton(data.isValid === true);
+        }
+      }
+    });
+
+    window.addEventListener('message', function(event) {
+      if (event.data === 'cancel-button-pressed') {
+        currentProvider.close();
+        currentProvider = null;
+
+        Fliplet.Studio.emit('widget-save-label-update', {
+          text: 'Save'
+        });
+      }
+    });
+
+    Fliplet.Studio.emit('widget-save-label-update', {
+      text: 'Select & Save'
+    });
+
+    currentProvider.then(function(data) {
+      if (data.data) {
+        row.data.icon = data && typeof data.data.icon !== 'undefined' ? data.data.icon : '';
+        $('[data-id="' + row.id + '"] [data-select-icon]').text('Replace icon');
+        $('[data-id="' + row.id + '"] .icon-selection').addClass('icon-selected');
+        $('[data-id="' + row.id + '"] .selected-icon').addClass(data.data.icon);
+        saveManager();
+      }
+
+      Fliplet.Studio.emit('widget-save-label-update', {
+        text: 'Save'
+      });
+      currentProvider = null;
+      return Promise.resolve();
+    });
+  }
 
   function saveSettings() {
     topMenu.id = $appMenu.val();
@@ -428,7 +493,6 @@
 
         // sets up new provider
         $('[data-id="' + itemId + '"] .link').html('');
-        console.log(movedItem);
         initLinkProvider(movedItem, currentDataSource.id);
 
         ui.item.removeClass('focus');

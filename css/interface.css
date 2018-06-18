@@ -1,11 +1,28 @@
 /*BUTTONS*/
 body {
+  cursor: auto;
+  position: absolute;
+  top: 0;
+  bottom: 60px;
+  width: 100%;
+  height: 100%;
   background-color: transparent;
-  padding: 15px 15px 54px;
+}
+
+.fl-widget-provider {
+  border: 0;
+  width: 100%;
+  background-color: transparent;
+  padding: 15px;
+}
+
+.link .fl-widget-provider {
+  padding: 0;
 }
 
 .widget-holder {
   overflow: hidden;
+  padding: 15px 15px 54px;
 }
 
 .widget-holder header {
@@ -421,4 +438,13 @@ footer {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+.icon-selection .selected-icon-holder {
+  display: none;
+}
+
+.icon-selection.icon-selected .selected-icon-holder {
+  display: block;
+  margin-top: 5px;
 }
