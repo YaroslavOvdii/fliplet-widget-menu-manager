@@ -301,14 +301,15 @@
     })
     .on('click', '.remove-icon', function() {
       var itemId = $(this).parents('.panel').data('id');
+      var $parent = $(this).parents('.icon-selection');
       var currentItem = _.find(currentMenuItems, function(item) {
         return item.id === itemId;
       });
       var iconBak = currentItem.data.icon;
       currentItem.data.icon = undefined;
-      $(this).parents('.icon-selection').removeClass('icon-selected');
-      $(this).parents('.icon-selection').find('.selected-icon').removeClass(iconBak);
-      $(this).parents('.icon-selection').find('[data-select-icon]').text('Select an icon');
+      $parent.removeClass('icon-selected');
+      $parent.find('.selected-icon').removeClass(iconBak);
+      $parent.find('[data-select-icon]').text('Select an icon');
     });
 
   function initIconProvider(row) {
