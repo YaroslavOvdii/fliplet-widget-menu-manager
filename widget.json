@@ -6,7 +6,8 @@
   "tags": ["category:general"],
   "provider_only": true,
   "providers": [
-    "com.fliplet.link"
+    "com.fliplet.link",
+    "com.fliplet.icon-selector"
   ],
   "interface": {
     "dependencies": [
