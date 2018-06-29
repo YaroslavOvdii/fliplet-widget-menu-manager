@@ -120,13 +120,14 @@
             <input type="text" class="form-control link-label" value="\{{data.linkLabel}}"/>
           </div>
         </div>
-        <div class="form-group clearfix icon-selection \{{#if data.icon}}icon-selected\{{/if}}">
+        <div class="form-group clearfix">
           <div class="col-sm-4 control-label">
             <label>Icon</label>
           </div>
-          <div class="col-sm-8">
-            <div class="btn btn-default" data-select-icon>\{{#if data.icon}}Replace icon\{{else}}Select an icon\{{/if}}</div>
-            <div class="selected-icon-holder">Selected icon: <i class="selected-icon \{{data.icon}}"></i> - <a href="#" class="text-danger remove-icon">Remove icon</a></div>
+          <div class="col-sm-8 icon-selection-holder \{{#if data.icon}}icon-selected\{{/if}}">
+            <div class="selected-icon-holder"><i class="selected-icon \{{data.icon}}"></i></div>
+            <div class="button-controls-holder"><a href="#" data-select-icon>Replace icon</a> - <a href="#" class="text-danger remove-icon">Remove icon</a></div>
+            <div class="btn btn-default select-icon" data-select-icon>Select an icon</div>
           </div>
         </div>
         <div class="link">

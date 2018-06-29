@@ -245,7 +245,7 @@
     })
     .on('click', '.remove-icon', function() {
       var itemId = $(this).parents('.panel').data('id');
-      var $parent = $(this).parents('.icon-selection');
+      var $parent = $(this).parents('.icon-selection-holder');
       var currentItem = _.find(currentMenuItems, function(item) {
         return item.id === itemId;
       });
@@ -253,7 +253,6 @@
       currentItem.data.icon = undefined;
       $parent.removeClass('icon-selected');
       $parent.find('.selected-icon').removeClass(iconBak);
-      $parent.find('[data-select-icon]').text('Select an icon');
     });
 
   function initIconProvider(row) {
@@ -289,8 +288,7 @@
     currentProvider.then(function(data) {
       if (data.data) {
         row.data.icon = data && typeof data.data.icon !== 'undefined' ? data.data.icon : '';
-        $('[data-id="' + row.id + '"] [data-select-icon]').text('Replace icon');
-        $('[data-id="' + row.id + '"] .icon-selection').addClass('icon-selected');
+        $('[data-id="' + row.id + '"] .icon-selection-holder').addClass('icon-selected');
         $('[data-id="' + row.id + '"] .selected-icon').addClass(data.data.icon);
         saveManager();
       }
