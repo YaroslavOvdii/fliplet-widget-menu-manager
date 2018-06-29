@@ -440,11 +440,27 @@ footer {
   }
 }
 
-.icon-selection .selected-icon-holder {
+.select-icon {
+  display: inline-block;
+}
+
+.selected-icon-holder {
+  font-size: 44px;
+  width: 54px;
+  height: 54px;
+  line-height: 54px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.selected-icon-holder,
+.button-controls-holder,
+.icon-selected .select-icon {
   display: none;
 }
 
-.icon-selection.icon-selected .selected-icon-holder {
+.icon-selected .selected-icon-holder,
+.icon-selected .button-controls-holder {
   display: block;
-  margin-top: 5px;
 }
