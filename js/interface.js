@@ -31,11 +31,21 @@
     })
     .then(function(dataSources) {
       if (dataSources.length === 0) {
-        $("#initial-holder").show();
-      } else {
-        $("#panel-holder").show();
+        var data = {
+          appId: appId,
+          name: 'Custom menu',
+          type: 'menu'
+        };
+
+        return Fliplet.DataSources.create(data)
+          .then(function(dataSource) {
+            addMenu(dataSource);
+            $appMenu.val(dataSource.id).change();
+            $("#panel-holder").show();
+          });
       }
 
+      $("#panel-holder").show();
       dataSources.forEach(function(dataSource) {
         addMenu(dataSource);
       });
@@ -44,42 +54,8 @@
     });
 
   // Listeners
-  $('.add-menu').on('click', function() {
-    var data = {
-      appId: appId,
-      name: 'Untitled menu',
-      type: 'menu'
-    };
-    Fliplet.DataSources.create(data)
-      .then(function(dataSource) {
-        addMenu(dataSource);
-        $('#select-menu').val(dataSource.id).change();
-        $("#panel-holder").show();
-        $("#initial-holder").hide();
-      });
-  });
-
   $('#add-link').on('click', function() {
     addLink(currentDataSource.id);
-  });
-
-  $('#delete-menu').on('click', function() {
-    var menuId = getSelectedMenuId();
-    Fliplet.DataSources.delete(menuId);
-    delete(menusPromises[menuId]);
-    $("#select-menu option[value='" + menuId + "']").remove();
-    $appMenu.find("option[value='" + menuId + "']").remove();
-    $('#select-menu').val(0).change();
-    if ($.isEmptyObject(menusPromises)) {
-      $('#panel-holder').hide();
-      $('#initial-holder').show();
-    }
-
-    // Check if the main setting menu is this one and if it is changed it to All links
-    if (topMenu.id == menuId) {
-      $appMenu.val('pages').change();
-      saveSettings();
-    }
   });
 
   $("#accordion")
@@ -109,9 +85,7 @@
       $('.tab-content').trigger('scroll');
     });
 
-  $('#select-menu').on('change', function onMenuChange() {
-    updateSelectMenuText();
-
+  $appMenu.on('change', function() {
     // Change visible links
     var menuId = $(this).val();
 
@@ -121,41 +95,19 @@
     // Show only the selected one
     $('#menu-' + menuId).show();
 
-    // Change menu name on input
-    var menuName = getSelectedMenuName();
-    setMenuName(menuName);
-
     // Set current data source
-    if (menuId == 0) {
-      $('#menu-name-group').hide();
-      $('#save').hide();
+    if (menuId === 'pages' || menuId === '') {
       $('#menu-links').hide();
-      currentDataSource = null;
       $('#add-link').hide();
+      currentDataSource = null;
     } else {
-      $('#menu-name-group').show();
       $('#add-link').show();
-      $('#save').show();
       $('#menu-links').show();
       Fliplet.DataSources.connect(menuId)
         .then(function(source) {
           currentDataSource = source;
         });
     }
-  });
-
-  $('#menu-manager-link').on('click', function() {
-    $('.nav-tabs .active').removeClass('active');
-    $('#menu-manager-control').addClass('active');
-  });
-
-  $appMenu.on('change', function() {
-    var selectedText = $(this).find('option:selected').text();
-    $(this).parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
-  });
-
-  $('header .betaAlert').on('click', function() {
-    alert('During beta, please use live chat and let us know what you need help with.');
   });
 
   $('header .closeSideView').on('click', function() {
@@ -167,15 +119,7 @@
       return currentProvider.forwardSaveRequest();
     }
 
-    var tab = $('#menu-manager-control').hasClass('active') ? 'manager' : 'settings';
-    switch (tab) {
-      case 'manager':
-        saveManager();
-        break;
-      case 'settings':
-        saveSettings();
-        break;
-    }
+    saveManager();
     Fliplet.Studio.emit('reload-page-preview');
   });
 
@@ -359,40 +303,14 @@
     });
   }
 
-  function saveSettings() {
-    topMenu.id = $appMenu.val();
-    Fliplet.App.Settings.set({
-      topMenu: topMenu
-    }).then(function() {
-      Fliplet.Studio.emit('reload-page-preview');
-    });
-
-    showSuccessMessage();
-  }
-
   function saveManager() {
-    // Get new data source name
-    var newMenuName = getMenuName();
-
     if (!currentDataSource) {
-      return;
-    }
-
-    // Update data source if name was changed
-    if (getSelectedMenuName() !== newMenuName) {
-      $("#select-menu option:selected").text(newMenuName);
-      updateSelectMenuText();
-      $appMenu.find("option[value='" + currentDataSource.id + "']").text(newMenuName).change();
-
-      var updateOptions = {
-        id: currentDataSource.id,
-        name: newMenuName
-      };
-
-      Fliplet.DataSources.update(updateOptions)
-        .then(function() {
-          $('#select-menu option:selected').text(newMenuName);
-        });
+      topMenu.id = $appMenu.val();
+      return Fliplet.App.Settings.set({
+        topMenu: topMenu
+      }).then(function() {
+        Fliplet.Studio.emit('reload-page-preview');
+      });
     }
 
     // Get order of links
@@ -417,10 +335,12 @@
           return source.replaceWith(entries);
         });
     }).then(function() {
-      // Reload the screen when we make changes to the current menu and save
-      if ($appMenu.val() == currentDataSource.id) {
-        Fliplet.Studio.emit('reload-page-preview');
-      }
+      topMenu.id = $appMenu.val();
+      return Fliplet.App.Settings.set({
+        topMenu: topMenu
+      });
+    }).then(function() {
+      Fliplet.Studio.emit('reload-page-preview');
     });
 
     menusPromises[currentDataSource.id].forEach(function(linkActionProvider) {
@@ -440,9 +360,7 @@
   // Helpers
   function addMenu(dataSource) {
     menusPromises[dataSource.id] = [];
-    $('#select-menu').append(templates.menuOption(dataSource));
     $('#accordion').append(templates.menu(dataSource));
-
     $appMenu.append(templates.menuOption(dataSource));
 
     Fliplet.DataSources.connect(dataSource.id)
@@ -451,7 +369,24 @@
       })
       .then(function(rows) {
         if (!rows || !rows.length) {
-          return;
+          return Fliplet.Pages.get()
+            .then(function(appPages) {
+              appPages.forEach(function(page) {
+                var newRow = {
+                  data: {
+                    action: {
+                      action: 'screen',
+                      page: page.id,
+                      transition: 'slide.left'
+                    },
+                    linkLabel: page.title,
+                    icon: 'fa fa-circle'
+                  },
+                  id: page.id
+                }
+                addLink(dataSource.id, newRow);
+              });
+            });
         }
 
         rows = _.sortBy(rows, 'data.order');
@@ -559,27 +494,5 @@
     $('#menu-' + dataSourceId).append(templates.menuLink(row));
 
     initLinkProvider(row, dataSourceId);
-  }
-
-  // Getters / Setters
-  function getSelectedMenuId() {
-    return $('#select-menu').val();
-  }
-
-  function getSelectedMenuName() {
-    return $('#select-menu option:selected').text();
-  }
-
-  function getMenuName() {
-    return $('#menu-name').val();
-  }
-
-  function setMenuName(name) {
-    return $('#menu-name').val(name);
-  }
-
-  function updateSelectMenuText() {
-    var selectedText = $('#select-menu').find('option:selected').text();
-    $('#select-menu').parents('.select-proxy-display').find('.select-value-proxy').html(selectedText);
   }
 })();
