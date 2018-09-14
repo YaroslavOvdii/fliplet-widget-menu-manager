@@ -47,6 +47,9 @@
 
       $("#panel-holder").show();
       dataSources.forEach(function(dataSource) {
+        if (dataSource.name !== 'Custom menu') {
+          dataSource.name = 'Custom menu';
+        }
         addMenu(dataSource);
       });
 
