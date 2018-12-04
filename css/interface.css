@@ -9,6 +9,10 @@ body {
   background-color: transparent;
 }
 
+.fa-times-thin:before {
+  content: '\00d7';
+}
+
 .fl-widget-provider {
   border: 0;
   width: 100%;
@@ -25,17 +29,21 @@ body {
   padding: 15px 15px 54px;
 }
 
-.widget-holder header {
+.widget-holder header p {
+  font-weight: bold;
+}
+
+.widget-holder header a.closeSideView {
+  color: #333333;
   font-size: 0.8em;
 }
 
-a.closeSideView {
-  color: #d2e0e4;
-  margin-right: 5px;
-}
-
-a.closeSideView:hover {
-  color: #006c85;
+.widget-holder header a.closeSideView:hover,
+.widget-holder header a.closeSideView:active,
+.widget-holder header a.closeSideView:focus,
+.widget-holder header a.closeSideView:active:hover,
+.widget-holder header a.closeSideView:active:focus {
+  color: #333333;
 }
 
 .btn.disabled,
@@ -77,7 +85,6 @@ footer {
   opacity: 1;
   -webkit-transition: opacity 100ms linear, -webkit-transform 100ms linear;
   transition: opacity 100ms linear, -webkit-transform 100ms linear;
-  background-color: #f2f6f7;
 }
 
 .panel.focus {
@@ -93,13 +100,8 @@ footer {
   -webkit-transition: opacity 50ms linear;
 }
 
-.panel-default {
-  border-color: #d3dbde;
-}
-
 .panel-default > .panel-heading {
-  background-color: #e4e9eb;
-  border-color: #d3dbde;
+  border-color: rgba(51, 51, 51, 0.1);
   border-radius: 0;
 }
 
@@ -160,14 +162,6 @@ footer {
 .panel-collapse.in {
   opacity: 1;
   -webkit-transition: opacity 0.1s linear;
-}
-
-.placeholder {
-  border: 1px solid rgb(0, 171, 210);
-  background-color: #f2f6f7;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.07) 0 1px 1px 0 inset, rgba(0, 171, 210, 0.4) 0 0 6px 0;
-  -moz-box-shadow: rgba(0, 0, 0, 0.07) 0 1px 1px 0 inset, rgba(0, 171, 210, 0.4) 0 0 6px 0;
-  box-shadow: rgba(0, 0, 0, 0.07) 0 1px 1px 0 inset, rgba(0, 171, 210, 0.4) 0 0 6px 0;
 }
 
 .tile {
