@@ -265,7 +265,7 @@ footer {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
-  background-image: url('../img/icon.png');
+  background-image: url('img/icon.png');
   overflow: hidden;
   margin-bottom: 10px;
 }
