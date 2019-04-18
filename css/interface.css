@@ -26,7 +26,21 @@ body {
 
 .widget-holder {
   overflow: hidden;
-  padding: 15px 15px 54px;
+  padding: 0px 15px 54px;
+}
+
+.widget-holder header {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.1);
+  margin-bottom: 1.0rem;
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  padding: 0 1.5rem;
+  color: #333333;
+  height: 4rem;
 }
 
 .widget-holder header p {
@@ -36,6 +50,7 @@ body {
 .widget-holder header a.closeSideView {
   color: #333333;
   font-size: 0.8em;
+  margin: 0;
 }
 
 .widget-holder header a.closeSideView:hover,
