@@ -5,59 +5,61 @@
     <a href="#" class="closeSideView"><i class="fa fa-times-thin fa-lg fa-2x"></i></a>
   </header>
 
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active" id="menu-settings-control"><a href="#menu-settings" aria-controls="menu-settings" role="tab" data-toggle="tab">Menu styles</a></li>
-    <li role="presentation" id="menu-manager-control"><a href="#menu-manager" aria-controls="menu-manager" role="tab" data-toggle="tab">Menu links</a></li>
-  </ul>
+  <div class="widget-content">
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active" id="menu-settings-control"><a href="#menu-settings" aria-controls="menu-settings" role="tab" data-toggle="tab">Menu styles</a></li>
+      <li role="presentation" id="menu-manager-control"><a href="#menu-manager" aria-controls="menu-manager" role="tab" data-toggle="tab">Menu links</a></li>
+    </ul>
 
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="menu-settings">
-      <div class="menu-styles-wrapper">
-        <div class="instance-loading">
-          <div class="spinner-holder animated">
-            <div class="spinner-overlay">Loading...</div>
-            <p>Loading...</p>
-          </div>
-        </div>
-        <div class="custom-menus clearfix"></div>
-      </div>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="menu-manager">      
-
-      <div class="" id="panel-holder" style="display: none">
-        <form class="form-horizontal">
-
-          <div class="form-group">
-            <div class="col-sm-4 control-label">
-              <label>Select menu</label>
-            </div>
-            <div class="col-sm-8">
-              <label for="app-menu" class="select-proxy-display">
-                <select id="app-menu" class="hidden-select form-control">
-                  <option value="">Hide menu</option>
-                  <option value="pages" selected>All screens</option>
-                </select>
-                <span class="icon fa fa-chevron-down"></span>
-                <span class="select-value-proxy">All screens</span>
-              </label>
+    <div class="tab-content menus-list">
+      <div role="tabpanel" class="tab-pane active" id="menu-settings">
+        <div class="menu-styles-wrapper">
+          <div class="instance-loading">
+            <div class="spinner-holder animated">
+              <div class="spinner-overlay">Loading...</div>
+              <p>Loading...</p>
             </div>
           </div>
+          <div class="custom-menus clearfix"></div>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="menu-manager">      
 
-        </form>
-        <div id="menu-links" style="display: none">
-          <div class="panel-group ui-sortable" id="accordion">
-            <!-- LINKS -->
-          </div>
+        <div class="" id="panel-holder" style="display: none">
+          <form class="form-horizontal">
 
-          <div class="controls">
-            <button class="btn btn-default start-item" id="add-link" style="display: none">Add menu link</button>
+            <div class="form-group">
+              <div class="col-sm-4 control-label">
+                <label>Select menu</label>
+              </div>
+              <div class="col-sm-8">
+                <label for="app-menu" class="select-proxy-display">
+                  <select id="app-menu" class="hidden-select form-control">
+                    <option value="">Hide menu</option>
+                    <option value="pages" selected>All screens</option>
+                  </select>
+                  <span class="icon fa fa-chevron-down"></span>
+                  <span class="select-value-proxy">All screens</span>
+                </label>
+              </div>
+            </div>
+
+          </form>
+          <div id="menu-links" style="display: none">
+            <div class="panel-group ui-sortable" id="accordion">
+              <!-- LINKS -->
+            </div>
+
+            <div class="controls">
+              <button class="btn btn-default start-item" id="add-link" style="display: none">Add menu link</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div role="alert" class="fade-transition alert alert-success" id="success-alert">
-    The Menu has been updated
+    <div role="alert" class="fade-transition alert alert-success" id="success-alert">
+      The Menu has been updated
+    </div>
   </div>
 </div>
 
