@@ -22,7 +22,7 @@
     ],
     "assets": [
       "js/interface.js",
-      "css/interface.css"
+      "interface.css"
     ]
   },
   "build": {
