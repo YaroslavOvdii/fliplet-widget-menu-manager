@@ -26,9 +26,9 @@
   var menusPromises = {};
 
   Fliplet.DataSources.get({
-      type: 'menu',
-      appId: appId,
-    })
+    type: 'menu',
+    appId: appId
+  })
     .then(function(dataSources) {
       if (dataSources.length === 0) {
         var data = {
@@ -41,11 +41,11 @@
           .then(function(dataSource) {
             addMenu(dataSource);
             $appMenu.val(dataSource.id).change();
-            $("#panel-holder").show();
+            $('#panel-holder').show();
           });
       }
 
-      $("#panel-holder").show();
+      $('#panel-holder').show();
       dataSources.forEach(function(dataSource) {
         addMenu(dataSource);
       });
@@ -58,10 +58,10 @@
     addLink(currentDataSource.id);
   });
 
-  $("#accordion")
+  $('#accordion')
     .on('click', '.icon-delete', function() {
-      var $item = $(this).closest("[data-id], .panel"),
-        id = $item.data('id');
+      var $item = $(this).closest('[data-id], .panel');
+      var id = $item.data('id');
 
       $item.remove();
 
@@ -132,7 +132,7 @@
         var obj = menusPromises[key];
         for (var prop in obj) {
           // skip loop if the property is from prototype
-          if(!obj.hasOwnProperty(prop)) continue;
+          if (!obj.hasOwnProperty(prop)) continue;
 
           obj[prop].forwardCancelRequest();
         }
@@ -194,34 +194,34 @@
 
   // Handler to change the menu
   $('body').on('click', '[data-widget-id]', function(event) {
-      event.preventDefault();
-      var $el = $(this);
-      var widgetId = $el.data('widget-id');
-      $('.menu-styles-wrapper').addClass('loading');
-      $('.radio_' + widgetId).prop('checked', true);
-      
-      // First, remove any existing menu widgetInstance
-      Promise.all(customMenus.map(function(menu) {
-        return Promise.all(menu.instances.map(function(instance) {
-          return Fliplet.API.request({
-            method: 'DELETE',
-            url: 'v1/widget-instances/' + instance.id
-          });
-        }));
-      })).then(function() {
-        // Then, create the new instance
+    event.preventDefault();
+    var $el = $(this);
+    var widgetId = $el.data('widget-id');
+    $('.menu-styles-wrapper').addClass('loading');
+    $('.radio_' + widgetId).prop('checked', true);
+
+    // First, remove any existing menu widgetInstance
+    Promise.all(customMenus.map(function(menu) {
+      return Promise.all(menu.instances.map(function(instance) {
         return Fliplet.API.request({
-          method: 'POST',
-          url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
-          data: {
-            widgetId: widgetId
-          }
+          method: 'DELETE',
+          url: 'v1/widget-instances/' + instance.id
         });
-      }).then(function() {
-        Fliplet.Studio.emit('reload-page-preview');
-        return loadCustomMenus();
+      }));
+    })).then(function() {
+      // Then, create the new instance
+      return Fliplet.API.request({
+        method: 'POST',
+        url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
+        data: {
+          widgetId: widgetId
+        }
       });
-    })
+    }).then(function() {
+      Fliplet.Studio.emit('reload-page-preview');
+      return loadCustomMenus();
+    });
+  })
     .on('click', '[data-settings]', function(event) {
       event.preventDefault();
 
@@ -312,14 +312,14 @@
     }
 
     // Get order of links
-    var sortedIds = $('#menu-' + currentDataSource.id).sortable("toArray", {
+    var sortedIds = $('#menu-' + currentDataSource.id).sortable('toArray', {
       attribute: 'data-id'
     });
 
     // Update Links
     Promise.all(menusPromises[currentDataSource.id].map(function(provider) {
       // Do stuff in here with result from provider
-      return new Promise(function(resolve, reject) {
+      return new Promise(function(resolve) {
         provider.then(function(result) {
           provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
           provider.row.data.linkLabel = $('[data-id="' + provider.row.id + '"]').find('.link-label').val();
@@ -381,7 +381,7 @@
                     icon: 'fa fa-circle'
                   },
                   id: page.id
-                }
+                };
                 addLink(dataSource.id, newRow);
               });
             });
@@ -394,8 +394,8 @@
       });
 
     $('#menu-' + dataSource.id).sortable({
-      handle: ".panel-heading",
-      cancel: ".icon-delete",
+      handle: '.panel-heading',
+      cancel: '.icon-delete',
       tolerance: 'pointer',
       revert: 150,
       placeholder: 'panel panel-default placeholder tile',
@@ -435,7 +435,7 @@
 
         saveManager();
       },
-      sort: function(event, ui) {
+      sort: function() {
         $('#menu-' + dataSource.id).sortable('refresh');
       }
     });
