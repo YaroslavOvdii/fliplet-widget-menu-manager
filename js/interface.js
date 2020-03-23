@@ -78,7 +78,7 @@
     .on('show.bs.collapse', '.panel-collapse', function() {
       var menuItemId = $(this).parent().data('id');
 
-      checkIsProviderInited(menuItemId);
+      ensureLinkProviderIsInitialized(menuItemId);
 
       $(this).siblings('.panel-heading').find('.fa-chevron-right').removeClass('fa-chevron-right').addClass('fa-chevron-down');
     })
@@ -413,7 +413,7 @@
       start: function(event, ui) {
         var sortedItemId = $(ui.item).data('id');
 
-        checkIsProviderInited(sortedItemId);
+        ensureLinkProviderIsInitialized(sortedItemId);
 
         $('.panel-collapse.in').collapse('hide');
         ui.item.addClass('focus').css('height', ui.helper.find('.panel-heading').outerHeight() + 2);
@@ -433,11 +433,11 @@
   }
 
   /**
-   * Function that deside should we run intiLinkProvider function or not
+   * This function ensures the initLinkProvider method has been initialised
    * @param {int} menuItemId - an id of the menu item we should check
    * @returns {void}
   */
-  function checkIsProviderInited(menuItemId) {
+  function ensureLinkProviderIsInitialized(menuItemId) {
     var isProviderInited = menusPromises[currentDataSource.id].some(function(provider) {
       return provider.row.id === menuItemId;
     });
