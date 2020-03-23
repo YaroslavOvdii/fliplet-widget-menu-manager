@@ -76,6 +76,10 @@
       $(this).parents('.panel').find('.panel-title-text').html(this.value);
     })
     .on('show.bs.collapse', '.panel-collapse', function() {
+      var menuItemId = $(this).parent().data('id');
+
+      ensureLinkProviderIsInitialized(menuItemId);
+
       $(this).siblings('.panel-heading').find('.fa-chevron-right').removeClass('fa-chevron-right').addClass('fa-chevron-down');
     })
     .on('hide.bs.collapse', '.panel-collapse', function() {
@@ -312,7 +316,7 @@
     }
 
     // Get order of links
-    var sortedIds = $('#menu-' + currentDataSource.id).sortable('toArray', {
+    var sortedMenuItemIds = $('#menu-' + currentDataSource.id).sortable('toArray', {
       attribute: 'data-id'
     });
 
@@ -321,16 +325,18 @@
       // Do stuff in here with result from provider
       return new Promise(function(resolve) {
         provider.then(function(result) {
-          provider.row.data.order = sortedIds.indexOf(provider.row.id.toString());
+          provider.row.data.order = sortedMenuItemIds.indexOf(provider.row.id.toString());
           provider.row.data.linkLabel = $('[data-id="' + provider.row.id + '"]').find('.link-label').val();
           provider.row.data.action = result.data;
+          provider.row.data.entryId = provider.row.id;
           resolve(provider.row.data);
         });
       });
-    })).then(function(entries) {
+    })).then(function(menuDataEntries) {
       return Fliplet.DataSources.connect(currentDataSource.id)
         .then(function(source) {
-          return source.replaceWith(entries);
+          mergeMenuEntries(menuDataEntries, sortedMenuItemIds);
+          return source.replaceWith(menuDataEntries);
         });
     }).then(function() {
       topMenu.id = $appMenu.val();
@@ -339,6 +345,9 @@
       });
     }).then(function() {
       Fliplet.Studio.emit('reload-page-preview');
+
+      // Clear promissed menu array to avoid error 'You cannot call "forwardSaveRequest" on a provider which already resolved.'
+      menusPromises[currentDataSource.id] = [];
     });
 
     menusPromises[currentDataSource.id].forEach(function(linkActionProvider) {
@@ -402,33 +411,15 @@
       cursor: '-webkit-grabbing; -moz-grabbing;',
       axis: 'y',
       start: function(event, ui) {
-        var itemId = $(ui.item).data('id');
-        var itemProvider = _.find(menusPromises[currentDataSource.id], function(provider) {
-          return provider.row.id === itemId;
-        });
+        var sortedItemId = $(ui.item).data('id');
 
-        saveManager();
-
-        // removes provider
-        itemProvider = null;
-        _.remove(menusPromises[currentDataSource.id], function(provider) {
-          return provider.row.id === itemId;
-        });
+        ensureLinkProviderIsInitialized(sortedItemId);
 
         $('.panel-collapse.in').collapse('hide');
         ui.item.addClass('focus').css('height', ui.helper.find('.panel-heading').outerHeight() + 2);
         $('.panel').not(ui.item).addClass('faded');
       },
       stop: function(event, ui) {
-        var itemId = $(ui.item).data('id');
-        var movedItem = _.find(currentMenuItems, function(item) {
-          return item.id === itemId;
-        });
-
-        // sets up new provider
-        $('[data-id="' + itemId + '"] .link').html('');
-        initLinkProvider(movedItem, currentDataSource.id);
-
         ui.item.removeClass('focus');
 
         $('.panel').not(ui.item).removeClass('faded');
@@ -437,6 +428,52 @@
       },
       sort: function() {
         $('#menu-' + dataSource.id).sortable('refresh');
+      }
+    });
+  }
+
+  /**
+   * This function ensures the initLinkProvider method has been initialised
+   * @param {int} menuItemId - an id of the menu item we should check
+   * @returns {void}
+  */
+  function ensureLinkProviderIsInitialized(menuItemId) {
+    var isProviderInited = menusPromises[currentDataSource.id].some(function(provider) {
+      return provider.row.id === menuItemId;
+    });
+
+    // We sould init only a new provider to avoid erros with forward requests
+    if (!isProviderInited) {
+      currentMenuItems.some(function(menuItem) {
+        if (menuItem.id === menuItemId) {
+          // sets up new provider
+          $('[data-id="' + menuItemId + '"] .link').html('');
+          initLinkProvider(menuItem, currentDataSource.id);
+          return true;
+        }
+      });
+    }
+  }
+
+  /**
+   *  Method to merge links where link provider wasn't called
+   * @param {array} menuDataEntries - array of the entries which we will put into the data source
+   * @param {array} sortedIds - array of the sorted menu id's
+   * @returns {void}
+  */
+  function mergeMenuEntries(menuDataEntries, sortedIds) {
+    currentMenuItems.forEach(function(menuItem) {
+      var isMenuItemExists = menuDataEntries.some(function(entry) {
+        return entry.entryId === menuItem.id;
+      });
+
+      if (!isMenuItemExists) {
+        // Update link order in case it was chaged by the user
+        menuItem.data.order = sortedIds.indexOf(menuItem.id.toString());
+
+        // Update link label in case it was changed by the user
+        menuItem.data.linkLabel = $('[data-id="' + menuItem.id + '"]').find('.link-label').val();
+        menuDataEntries.push(menuItem.data);
       }
     });
   }
