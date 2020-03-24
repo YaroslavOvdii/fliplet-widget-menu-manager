@@ -467,10 +467,12 @@
       var isMenuItemExists = menuDataEntries.some(function(entry) {
         return entry.entryId === menuItem.id;
       });
+      var menuItemOrder = sortedIds.indexOf(menuItem.id.toString());
 
-      if (!isMenuItemExists) {
+      // if menuItemOreder === 1 it means that no such DOM elem and we shouldn't add it
+      if (!isMenuItemExists && menuItemOrder !== -1) {
         // Update link order in case it was chaged by the user
-        menuItem.data.order = sortedIds.indexOf(menuItem.id.toString());
+        menuItem.data.order = menuItemOrder;
 
         // Update link label in case it was changed by the user
         menuItem.data.linkLabel = $('[data-id="' + menuItem.id + '"]').find('.link-label').val();
