@@ -68,6 +68,7 @@
       for (var i = 0; i < menusPromises[currentDataSource.id].length; i++) {
         if (menusPromises[currentDataSource.id][i].row.id === id) {
           menusPromises[currentDataSource.id].splice(i, 1);
+          currentMenuItems.splice(i, 1);
           break;
         }
       }
