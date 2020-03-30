@@ -292,9 +292,10 @@
 
     currentProvider.then(function(data) {
       if (data.data) {
+        var previousIconClass = row.data.icon;
         row.data.icon = data && typeof data.data.icon !== 'undefined' ? data.data.icon : '';
         $('[data-id="' + row.id + '"] .icon-selection-holder').addClass('icon-selected');
-        $('[data-id="' + row.id + '"] .selected-icon').addClass(data.data.icon);
+        $('[data-id="' + row.id + '"] .selected-icon').removeClass(previousIconClass).addClass(data.data.icon);
         saveManager();
       }
 
@@ -346,9 +347,6 @@
       });
     }).then(function() {
       Fliplet.Studio.emit('reload-page-preview');
-
-      // Clear promissed menu array to avoid error 'You cannot call "forwardSaveRequest" on a provider which already resolved.'
-      menusPromises[currentDataSource.id] = [];
     });
 
     menusPromises[currentDataSource.id].forEach(function(linkActionProvider) {
@@ -469,7 +467,7 @@
       });
       var menuItemOrder = sortedIds.indexOf(menuItem.id.toString());
 
-      // if menuItemOreder === 1 it means that no such DOM elem and we shouldn't add it
+      // if menuItemOreder === -1 it means that no such DOM elem and we shouldn't add it
       if (!isMenuItemExists && menuItemOrder !== -1) {
         // Update link order in case it was chaged by the user
         menuItem.data.order = menuItemOrder;
