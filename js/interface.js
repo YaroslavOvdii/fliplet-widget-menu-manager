@@ -308,6 +308,8 @@
   }
 
   function saveManager() {
+    showSuccessMessage();
+
     if (!currentDataSource) {
       topMenu.id = $appMenu.val();
       return Fliplet.App.Settings.set({
@@ -352,8 +354,6 @@
     menusPromises[currentDataSource.id].forEach(function(linkActionProvider) {
       linkActionProvider.forwardSaveRequest();
     });
-
-    showSuccessMessage();
   }
 
   function showSuccessMessage() {
