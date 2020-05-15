@@ -524,8 +524,15 @@
       data: row.data.action,
       // Events fired from the provider
       onEvent: function(event, data) {
-        if (event === 'interface-validate') {
-          Fliplet.Widget.toggleSaveButton(data.isValid === true);
+        switch (event) {
+          case 'inteface-validate':
+            Fliplet.Widget.toggleSaveButton(data.isValid === true);
+            break;
+          case 'file-picker-closed':
+            Fliplet.Widget.setSaveButtonLabel('Save');
+            break;
+          default:
+            break;
         }
       },
       closeOnSave: false
