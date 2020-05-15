@@ -18,6 +18,7 @@
   var currentMenu;
   var currentProvider;
   var currentMenuItems = [];
+  var activeTab = 'menu-settings';
 
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
@@ -54,6 +55,48 @@
     });
 
   // Listeners
+  $('.nav.nav-tabs li a').on('click', function(event) {
+    activeTab = $(event.target).attr('aria-controls');
+
+    switch (activeTab) {
+      case 'menu-settings':
+        // Remove save button on Menu Styles tab
+        Fliplet.Widget.setSaveButtonLabel('');
+        Fliplet.Widget.setCancelButtonLabel('Close');
+        break;
+      case 'menu-manager':
+        Fliplet.Widget.setSaveButtonLabel('Save');
+        Fliplet.Widget.setCancelButtonLabel('Cancel');
+        break;
+      default:
+        break;
+    }
+  });
+
+  window.addEventListener('message', function(event) {
+    if (event.data === 'cancel-button-pressed') {
+      if (currentProvider) {
+        currentProvider.close();
+        currentProvider = null;
+
+        Fliplet.Studio.emit('widget-save-label-update', {
+          text: 'Save'
+        });
+      } else {
+        switch (activeTab) {
+          case 'menu-settings':
+            Fliplet.Studio.emit('widget-save-complete');
+            break;
+          case 'menu-manager':
+            $('.nav.nav-tabs li a[aria-controls="menu-settings"]').trigger('click');
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  });
+
   $('#add-link').on('click', function() {
     addLink(currentDataSource.id);
   });
@@ -272,17 +315,6 @@
         if (event === 'interface-validate') {
           Fliplet.Widget.toggleSaveButton(data.isValid === true);
         }
-      }
-    });
-
-    window.addEventListener('message', function(event) {
-      if (event.data === 'cancel-button-pressed') {
-        currentProvider.close();
-        currentProvider = null;
-
-        Fliplet.Studio.emit('widget-save-label-update', {
-          text: 'Save'
-        });
       }
     });
 
@@ -532,3 +564,9 @@
     initLinkProvider(row, dataSourceId);
   }
 })();
+
+Fliplet().then(function() {
+  // Initial labels
+  Fliplet.Widget.setSaveButtonLabel('');
+  Fliplet.Widget.setCancelButtonLabel('Close');
+});
