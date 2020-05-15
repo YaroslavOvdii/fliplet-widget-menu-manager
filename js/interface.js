@@ -269,8 +269,15 @@
       data: row.data,
       // Events fired from the provider
       onEvent: function(event, data) {
-        if (event === 'interface-validate') {
-          Fliplet.Widget.toggleSaveButton(data.isValid === true);
+        switch (event) {
+          case 'interface-validate':
+            Fliplet.Widget.toggleSaveButton(data.isValid === true);
+            break;
+          case 'icon-clicked':
+            Fliplet.Widget.toggleSaveButton(data.isSelected);
+            break;
+          default:
+            break;
         }
       }
     });
