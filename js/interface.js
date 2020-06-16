@@ -20,177 +20,235 @@
   var currentMenuItems = [];
   var activeTab = 'menu-settings';
 
+  var menusPromises = {};
+  var menuDataSources = [];
+  var customMenus = [];
+  var customMenuLoadingPromise;
+
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
   }
 
-  var menusPromises = {};
+  function addMenuOption(dataSource) {
+    $appMenu.append(templates.menuOption(dataSource));
+  }
 
-  Fliplet.DataSources.get({
-    type: 'menu',
-    appId: appId
-  })
-    .then(function(dataSources) {
-      if (dataSources.length === 0) {
-        var data = {
-          appId: appId,
-          name: 'Custom menu',
-          type: 'menu'
-        };
+  function attachObservers() {
+    // Listeners
+    $('.nav.nav-tabs li a').on('click', function(event) {
+      activeTab = $(event.target).attr('aria-controls');
 
-        return Fliplet.DataSources.create(data)
-          .then(function(dataSource) {
-            addMenu(dataSource);
-            $appMenu.val(dataSource.id).change();
-            $('#panel-holder').show();
-          });
+      switch (activeTab) {
+        case 'menu-settings':
+        default:
+          // Remove save button on Menu Styles tab
+          Fliplet.Widget.setSaveButtonLabel('');
+          Fliplet.Widget.setCancelButtonLabel('Close');
+          break;
+        case 'menu-manager':
+          Fliplet.Widget.setSaveButtonLabel('Save');
+          Fliplet.Widget.setCancelButtonLabel('Cancel');
+          loadCustomMenus();
+          break;
       }
+    });
 
-      $('#panel-holder').show();
-      dataSources.forEach(function(dataSource) {
-        addMenu(dataSource);
+    window.addEventListener('message', function(event) {
+      if (event.data === 'cancel-button-pressed') {
+        if (currentProvider) {
+          currentProvider.close();
+          currentProvider = null;
+
+          Fliplet.Studio.emit('widget-save-label-update', {
+            text: 'Save'
+          });
+        } else {
+          switch (activeTab) {
+            case 'menu-settings':
+              Fliplet.Studio.emit('widget-save-complete');
+              break;
+            case 'menu-manager':
+              $('.nav.nav-tabs li a[aria-controls="menu-settings"]').trigger('click');
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    });
+
+    $('#add-link').on('click', function() {
+      addLink(currentDataSource.id);
+    });
+
+    $('#accordion')
+      .on('click', '.icon-delete', function() {
+        var $item = $(this).closest('[data-id], .panel');
+        var id = $item.data('id');
+
+        $item.remove();
+
+        for (var i = 0; i < menusPromises[currentDataSource.id].length; i++) {
+          if (menusPromises[currentDataSource.id][i].row.id === id) {
+            menusPromises[currentDataSource.id].splice(i, 1);
+            currentMenuItems.splice(i, 1);
+            break;
+          }
+        }
+      })
+      .on('keyup change paste', '.link-label', function() {
+        $(this).parents('.panel').find('.panel-title-text').html(this.value);
+      })
+      .on('show.bs.collapse', '.panel-collapse', function() {
+        var menuItemId = $(this).parent().data('id');
+
+        ensureLinkProviderIsInitialized(menuItemId);
+
+        $(this).siblings('.panel-heading').find('.fa-chevron-right').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+      })
+      .on('hide.bs.collapse', '.panel-collapse', function() {
+        $(this).siblings('.panel-heading').find('.fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-right');
+      })
+      .on('shown.bs.collapse hidden.bs.collapse', '.panel-collapse', function() {
+        $('.tab-content').trigger('scroll');
       });
 
-      $appMenu.val(topMenu.id).change();
-    });
+    $appMenu.on('change', function() {
+      var menuId = $(this).val();
 
-  // Listeners
-  $('.nav.nav-tabs li a').on('click', function(event) {
-    activeTab = $(event.target).attr('aria-controls');
-
-    switch (activeTab) {
-      case 'menu-settings':
-        // Remove save button on Menu Styles tab
-        Fliplet.Widget.setSaveButtonLabel('');
-        Fliplet.Widget.setCancelButtonLabel('Close');
-        break;
-      case 'menu-manager':
-        Fliplet.Widget.setSaveButtonLabel('Save');
-        Fliplet.Widget.setCancelButtonLabel('Cancel');
-        break;
-      default:
-        break;
-    }
-  });
-
-  window.addEventListener('message', function(event) {
-    if (event.data === 'cancel-button-pressed') {
-      if (currentProvider) {
-        currentProvider.close();
-        currentProvider = null;
-
-        Fliplet.Studio.emit('widget-save-label-update', {
-          text: 'Save'
-        });
-      } else {
-        switch (activeTab) {
-          case 'menu-settings':
-            Fliplet.Studio.emit('widget-save-complete');
-            break;
-          case 'menu-manager':
-            $('.nav.nav-tabs li a[aria-controls="menu-settings"]').trigger('click');
-            break;
-          default:
-            break;
-        }
-      }
-    }
-  });
-
-  $('#add-link').on('click', function() {
-    addLink(currentDataSource.id);
-  });
-
-  $('#accordion')
-    .on('click', '.icon-delete', function() {
-      var $item = $(this).closest('[data-id], .panel');
-      var id = $item.data('id');
-
-      $item.remove();
-
-      for (var i = 0; i < menusPromises[currentDataSource.id].length; i++) {
-        if (menusPromises[currentDataSource.id][i].row.id === id) {
-          menusPromises[currentDataSource.id].splice(i, 1);
-          currentMenuItems.splice(i, 1);
-          break;
-        }
-      }
-    })
-    .on('keyup change paste', '.link-label', function() {
-      $(this).parents('.panel').find('.panel-title-text').html(this.value);
-    })
-    .on('show.bs.collapse', '.panel-collapse', function() {
-      var menuItemId = $(this).parent().data('id');
-
-      ensureLinkProviderIsInitialized(menuItemId);
-
-      $(this).siblings('.panel-heading').find('.fa-chevron-right').removeClass('fa-chevron-right').addClass('fa-chevron-down');
-    })
-    .on('hide.bs.collapse', '.panel-collapse', function() {
-      $(this).siblings('.panel-heading').find('.fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-right');
-    })
-    .on('shown.bs.collapse hidden.bs.collapse', '.panel-collapse', function() {
-      $('.tab-content').trigger('scroll');
-    });
-
-  $appMenu.on('change', function() {
-    // Change visible links
-    var menuId = $(this).val();
-
-    // Hide all menu panels
-    $('#accordion .menu').hide();
-
-    // Show only the selected one
-    $('#menu-' + menuId).show();
-
-    // Set current data source
-    if (menuId === 'pages' || menuId === '') {
-      $('#menu-links').hide();
+      $('#accordion .menu').remove();
       $('#add-link').hide();
-      currentDataSource = null;
-    } else {
-      $('#add-link').show();
+
+      if (menuId === 'pages' || menuId === '') {
+        $('#menu-links').hide();
+        currentDataSource = null;
+        return;
+      }
+
+      var getMenu = Promise.resolve();
+
       $('#menu-links').show();
-      Fliplet.DataSources.connect(menuId)
-        .then(function(source) {
-          currentDataSource = source;
-        });
-    }
-  });
 
-  $('header .closeSideView').on('click', function() {
-    Fliplet.Studio.emit('navigate', { name: 'appEdit' });
-  });
+      if (!$('#menu-' + menuId).length) {
+        var dataSource = _.find(menuDataSources, { id: parseInt(menuId, 10) });
 
-  Fliplet.Widget.onSaveRequest(function() {
-    if (currentProvider) {
-      return currentProvider.forwardSaveRequest();
-    }
+        if (!dataSource) {
+          console.warn('Menu data source not found');
+          return;
+        }
 
-    saveManager();
-    Fliplet.Studio.emit('reload-page-preview');
-  });
+        getMenu = addMenu(dataSource);
+      }
 
-  Fliplet.Widget.onCancelRequest(function() {
-    if (menusPromises) {
-      for (var key in menusPromises) {
-        // skip loop if the property is from prototype
-        if (!menusPromises.hasOwnProperty(key)) continue;
+      getMenu.then(function () {
+        // Show only the selected one
+        $('#menu-' + menuId).show();
+        $('#add-link').show();
 
-        var obj = menusPromises[key];
-        for (var prop in obj) {
+        return Fliplet.DataSources.connect(menuId)
+      }).then(function(source) {
+        // Set current data source
+        currentDataSource = source;
+      });
+    });
+
+    $('header .closeSideView').on('click', function() {
+      Fliplet.Studio.emit('navigate', { name: 'appEdit' });
+    });
+
+    Fliplet.Widget.onSaveRequest(function() {
+      if (currentProvider) {
+        return currentProvider.forwardSaveRequest();
+      }
+
+      saveManager();
+      Fliplet.Studio.emit('reload-page-preview');
+    });
+
+    Fliplet.Widget.onCancelRequest(function() {
+      if (menusPromises) {
+        for (var key in menusPromises) {
           // skip loop if the property is from prototype
-          if (!obj.hasOwnProperty(prop)) continue;
+          if (!menusPromises.hasOwnProperty(key)) continue;
 
-          obj[prop].forwardCancelRequest();
+          var obj = menusPromises[key];
+          for (var prop in obj) {
+            // skip loop if the property is from prototype
+            if (!obj.hasOwnProperty(prop)) continue;
+
+            obj[prop].forwardCancelRequest();
+          }
         }
       }
-    }
-    if (!currentProvider) { return; }
-    currentProvider.forwardCancelRequest();
-  });
+      if (!currentProvider) { return; }
+      currentProvider.forwardCancelRequest();
+    });
 
-  function fetchCustomMenus() {
+    // Handler to change the menu
+    $('body').on('click', '[data-widget-id]', function(event) {
+      event.preventDefault();
+      var $el = $(this);
+      var widgetId = $el.data('widget-id');
+      $('.menu-styles-wrapper').addClass('loading');
+      $('.radio_' + widgetId).prop('checked', true);
+
+      // First, remove any existing menu widgetInstance
+      Promise.all(customMenus.map(function(menu) {
+        return Promise.all(menu.instances.map(function(instance) {
+          return Fliplet.API.request({
+            method: 'DELETE',
+            url: 'v1/widget-instances/' + instance.id
+          });
+        }));
+      })).then(function() {
+        // Then, create the new instance
+        return Fliplet.API.request({
+          method: 'POST',
+          url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
+          data: {
+            widgetId: widgetId
+          }
+        });
+      }).then(function() {
+        Fliplet.Studio.emit('reload-page-preview');
+        return loadCustomMenuWidgets();
+      });
+    })
+      .on('click', '[data-settings]', function(event) {
+        event.preventDefault();
+
+        if (!currentMenu) {
+          return;
+        }
+
+        currentProvider = Fliplet.Widget.open(currentMenu.id);
+
+        currentProvider.then(function() {
+          currentProvider = null;
+          Fliplet.Studio.emit('reload-page-preview');
+        });
+      })
+      .on('click', '[data-select-icon]', function() {
+        var itemId = $(this).parents('.panel').data('id');
+        var currentItem = _.find(currentMenuItems, function(item) {
+          return item.id === itemId;
+        });
+        initIconProvider(currentItem);
+      })
+      .on('click', '.remove-icon', function() {
+        var itemId = $(this).parents('.panel').data('id');
+        var $parent = $(this).parents('.icon-selection-holder');
+        var currentItem = _.find(currentMenuItems, function(item) {
+          return item.id === itemId;
+        });
+        var iconBak = currentItem.data.icon;
+        currentItem.data.icon = undefined;
+        $parent.removeClass('icon-selected');
+        $parent.find('.selected-icon').removeClass(iconBak);
+      });
+  }
+
+  function fetchCustomMenuWidgets() {
     return Fliplet.API.request({
       url: [
         'v1/widgets?include_instances=true&tags=type:menu',
@@ -202,11 +260,9 @@
     });
   }
 
-  var customMenus = [];
-
-  function loadCustomMenus() {
+  function loadCustomMenuWidgets() {
     $('.menu-styles-wrapper').addClass('loading');
-    return fetchCustomMenus().then(function(menus) {
+    return fetchCustomMenuWidgets().then(function(menus) {
       customMenus = menus;
       $customMenus.html('');
 
@@ -236,72 +292,6 @@
       $('.menu-styles-wrapper').removeClass('loading');
     });
   }
-
-  // Load menus on startup
-  loadCustomMenus();
-
-  // Handler to change the menu
-  $('body').on('click', '[data-widget-id]', function(event) {
-    event.preventDefault();
-    var $el = $(this);
-    var widgetId = $el.data('widget-id');
-    $('.menu-styles-wrapper').addClass('loading');
-    $('.radio_' + widgetId).prop('checked', true);
-
-    // First, remove any existing menu widgetInstance
-    Promise.all(customMenus.map(function(menu) {
-      return Promise.all(menu.instances.map(function(instance) {
-        return Fliplet.API.request({
-          method: 'DELETE',
-          url: 'v1/widget-instances/' + instance.id
-        });
-      }));
-    })).then(function() {
-      // Then, create the new instance
-      return Fliplet.API.request({
-        method: 'POST',
-        url: 'v1/widget-instances?appId=' + Fliplet.Env.get('appId'),
-        data: {
-          widgetId: widgetId
-        }
-      });
-    }).then(function() {
-      Fliplet.Studio.emit('reload-page-preview');
-      return loadCustomMenus();
-    });
-  })
-    .on('click', '[data-settings]', function(event) {
-      event.preventDefault();
-
-      if (!currentMenu) {
-        return;
-      }
-
-      currentProvider = Fliplet.Widget.open(currentMenu.id);
-
-      currentProvider.then(function() {
-        currentProvider = null;
-        Fliplet.Studio.emit('reload-page-preview');
-      });
-    })
-    .on('click', '[data-select-icon]', function() {
-      var itemId = $(this).parents('.panel').data('id');
-      var currentItem = _.find(currentMenuItems, function(item) {
-        return item.id === itemId;
-      });
-      initIconProvider(currentItem);
-    })
-    .on('click', '.remove-icon', function() {
-      var itemId = $(this).parents('.panel').data('id');
-      var $parent = $(this).parents('.icon-selection-holder');
-      var currentItem = _.find(currentMenuItems, function(item) {
-        return item.id === itemId;
-      });
-      var iconBak = currentItem.data.icon;
-      currentItem.data.icon = undefined;
-      $parent.removeClass('icon-selected');
-      $parent.find('.selected-icon').removeClass(iconBak);
-    });
 
   function initIconProvider(row) {
     row.data.icon = row.data.icon || '';
@@ -402,45 +392,8 @@
     }, 2000);
   }
 
-  // Helpers
-  function addMenu(dataSource) {
-    menusPromises[dataSource.id] = [];
-    $('#accordion').append(templates.menu(dataSource));
-    $appMenu.append(templates.menuOption(dataSource));
-
-    Fliplet.DataSources.connect(dataSource.id)
-      .then(function(source) {
-        return source.find();
-      })
-      .then(function(rows) {
-        if (!rows || !rows.length) {
-          return Fliplet.Pages.get()
-            .then(function(appPages) {
-              appPages.forEach(function(page) {
-                var newRow = {
-                  data: {
-                    action: {
-                      action: 'screen',
-                      page: page.id,
-                      transition: 'slide.left'
-                    },
-                    linkLabel: page.title,
-                    icon: 'fa fa-circle'
-                  },
-                  id: page.id
-                };
-                addLink(dataSource.id, newRow);
-              });
-            });
-        }
-
-        rows = _.sortBy(rows, 'data.order');
-        rows.forEach(function(row) {
-          addLink(dataSource.id, row);
-        });
-      });
-
-    $('#menu-' + dataSource.id).sortable({
+  function initializeSortable(id) {
+    $('#menu-' + id).sortable({
       handle: '.panel-heading',
       cancel: '.icon-delete',
       tolerance: 'pointer',
@@ -464,10 +417,57 @@
 
         saveManager();
       },
-      sort: function() {
-        $('#menu-' + dataSource.id).sortable('refresh');
+      sort: function(id) {
+        $('#menu-' + id).sortable('refresh');
       }
     });
+  }
+
+  // Helpers
+  function addMenu(dataSource) {
+    if ($('#menu-' + dataSource.id).length) {
+      return Promise.resolve();
+    }
+
+    $('#menu-loading').show();
+
+    menusPromises[dataSource.id] = [];
+    $('#accordion').append(templates.menu(dataSource));
+    initializeSortable(dataSource.id);
+
+    return Fliplet.DataSources.connect(dataSource.id)
+      .then(function(source) {
+        return source.find();
+      })
+      .then(function(rows) {
+        if (!rows || !rows.length) {
+          return Fliplet.Pages.get()
+            .then(function(appPages) {
+              $('#menu-loading').hide();
+              appPages.forEach(function(page) {
+                var newRow = {
+                  data: {
+                    action: {
+                      action: 'screen',
+                      page: page.id,
+                      transition: 'slide.left'
+                    },
+                    linkLabel: page.title,
+                    icon: 'fa fa-circle'
+                  },
+                  id: page.id
+                };
+                addLink(dataSource.id, newRow);
+              });
+            });
+        }
+
+        rows = _.sortBy(rows, 'data.order');
+        $('#menu-loading').hide();
+        rows.forEach(function(row) {
+          addLink(dataSource.id, row);
+        });
+      });
   }
 
   /**
@@ -577,6 +577,48 @@
 
     initLinkProvider(row, dataSourceId);
   }
+
+  function loadCustomMenus() {
+    if (customMenuLoadingPromise) {
+      return customMenuLoadingPromise;
+    }
+
+    // Load custom menus
+    customMenuLoadingPromise = Fliplet.DataSources.get({
+      type: 'menu',
+      appId: appId
+    })
+      .then(function(dataSources) {
+        menuDataSources = dataSources;
+
+        if (!menuDataSources.length) {
+          var data = {
+            appId: appId,
+            name: 'Custom menu',
+            type: 'menu'
+          };
+
+          return Fliplet.DataSources.create(data)
+            .then(function(dataSource) {
+              addMenuOption(dataSource);
+              menuDataSources.push(dataSource);
+              $('#menu-manager-loading').remove();
+              $('#panel-holder').show();
+              $appMenu.val(dataSource.id).change();
+            });
+        }
+
+        dataSources.forEach(addMenuOption);
+        $('#menu-manager-loading').remove();
+        $('#panel-holder').show();
+        $appMenu.val(topMenu.id).change();
+      });
+    return customMenuLoadingPromise;
+  }
+
+  attachObservers();
+  // Load menu widgets on startup
+  loadCustomMenuWidgets();
 })();
 
 Fliplet().then(function() {
