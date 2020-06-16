@@ -141,8 +141,6 @@
       }
 
       getMenu.then(function () {
-        // Show only the selected one
-        $('#menu-' + menuId).show();
         $('#add-link').show();
 
         return Fliplet.DataSources.connect(menuId)
