@@ -25,6 +25,8 @@
   var customMenus = [];
   var customMenuLoadingPromise;
 
+  var isFilePickerClosed = false;
+
   function template(name) {
     return Handlebars.compile($('#template-' + name).html());
   }
@@ -33,22 +35,54 @@
     $appMenu.append(templates.menuOption(dataSource));
   }
 
+  function setWidgetControls(tab) {
+    switch (tab) {
+      case 'styles':
+        Fliplet.Widget.setSaveButtonLabel('');
+        Fliplet.Widget.setCancelButtonLabel('Close');
+        break;
+      case 'links':
+        Fliplet.Widget.setSaveButtonLabel('Save');
+        Fliplet.Widget.setCancelButtonLabel('Cancel');
+        break;
+      case 'settings':
+        Fliplet.Widget.setSaveButtonLabel('Save&Close');
+        Fliplet.Widget.setCancelButtonLabel('Cancel');
+        break;
+      default:
+        break;
+    }
+  }
+
+  /**
+   * We are using this function because there is a posibiblity that
+   * our listener onEvent in the initLinkProvider function will fires after
+   * this `cancel-button-pressed` event and so to avoid issue when we
+   * redirect user to the menu styles tab we are using this fucntion.
+   *
+   * @returns {Promise} - return a value of the isFilePickerClosed.
+   */
+  function checkIfFilePickerClosing() {
+    return new Promise(function(resolve) {
+      setTimeout(function() {
+        resolve(isFilePickerClosed);
+      }, 0);
+    });
+  }
+
   function attachObservers() {
     // Listeners
     $('.nav.nav-tabs li a').on('click', function(event) {
       activeTab = $(event.target).attr('aria-controls');
 
       switch (activeTab) {
+        case 'menu-manager':
+          setWidgetControls('links');
+          loadCustomMenus();
+          break;
         case 'menu-settings':
         default:
-          // Remove save button on Menu Styles tab
-          Fliplet.Widget.setSaveButtonLabel('');
-          Fliplet.Widget.setCancelButtonLabel('Close');
-          break;
-        case 'menu-manager':
-          Fliplet.Widget.setSaveButtonLabel('Save');
-          Fliplet.Widget.setCancelButtonLabel('Cancel');
-          loadCustomMenus();
+          setWidgetControls('styles');
           break;
       }
     });
@@ -59,16 +93,25 @@
           currentProvider.close();
           currentProvider = null;
 
-          Fliplet.Studio.emit('widget-save-label-update', {
-            text: 'Save'
-          });
+          if (activeTab === 'menu-settings') {
+            setWidgetControls('styles');
+          } else if (activeTab === 'menu-manager') {
+            setWidgetControls('links');
+          }
         } else {
           switch (activeTab) {
             case 'menu-settings':
               Fliplet.Studio.emit('widget-save-complete');
               break;
             case 'menu-manager':
-              $('.nav.nav-tabs li a[aria-controls="menu-settings"]').trigger('click');
+              checkIfFilePickerClosing()
+                .then(function(isFilePickerClosing) {
+                  if (!isFilePickerClosing) {
+                    $('.nav.nav-tabs li a[aria-controls="menu-settings"]').trigger('click');
+                  }
+
+                  isFilePickerClosed = false;
+                });
               break;
             default:
               break;
@@ -140,10 +183,10 @@
         getMenu = addMenu(dataSource);
       }
 
-      getMenu.then(function () {
+      getMenu.then(function() {
         $('#add-link').show();
 
-        return Fliplet.DataSources.connect(menuId)
+        return Fliplet.DataSources.connect(menuId);
       }).then(function(source) {
         // Set current data source
         currentDataSource = source;
@@ -220,10 +263,12 @@
         }
 
         currentProvider = Fliplet.Widget.open(currentMenu.id);
+        setWidgetControls('settings');
 
         currentProvider.then(function() {
           currentProvider = null;
           Fliplet.Studio.emit('reload-page-preview');
+          setWidgetControls('styles');
         });
       })
       .on('click', '[data-select-icon]', function() {
@@ -535,6 +580,7 @@
             break;
           case 'file-picker-closed':
             Fliplet.Widget.setSaveButtonLabel('Save');
+            isFilePickerClosed = true;
             break;
           default:
             break;
@@ -623,4 +669,5 @@ Fliplet().then(function() {
   // Initial labels
   Fliplet.Widget.setSaveButtonLabel('');
   Fliplet.Widget.setCancelButtonLabel('Close');
+  Fliplet.Widget.toggleCancelButton(true);
 });
