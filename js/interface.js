@@ -46,7 +46,7 @@
         Fliplet.Widget.setCancelButtonLabel('Cancel');
         break;
       case 'settings':
-        Fliplet.Widget.setSaveButtonLabel('Save&Close');
+        Fliplet.Widget.setSaveButtonLabel('Save & Close');
         Fliplet.Widget.setCancelButtonLabel('Cancel');
         break;
       default:
