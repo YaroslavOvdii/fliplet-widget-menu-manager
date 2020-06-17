@@ -16,16 +16,20 @@
         <div class="menu-styles-wrapper">
           <div class="instance-loading">
             <div class="spinner-holder animated">
-              <div class="spinner-overlay">Loading...</div>
+              <div class="spinner-overlay"></div>
               <p>Loading...</p>
             </div>
           </div>
           <div class="custom-menus clearfix"></div>
         </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="menu-manager">      
+      <div role="tabpanel" class="tab-pane" id="menu-manager">
+        <div class="spinner-holder animated" id="menu-manager-loading">
+          <div class="spinner-overlay"></div>
+          <p>Loading...</p>
+        </div>
 
-        <div class="" id="panel-holder" style="display: none">
+        <div id="panel-holder" style="display: none">
           <form class="form-horizontal">
 
             <div class="form-group">
@@ -39,7 +43,6 @@
                     <option value="pages" selected>All screens</option>
                   </select>
                   <span class="icon fa fa-chevron-down"></span>
-                  <span class="select-value-proxy">All screens</span>
                 </label>
               </div>
             </div>
@@ -47,6 +50,10 @@
           </form>
           <div id="menu-links" style="display: none">
             <div class="panel-group ui-sortable" id="accordion">
+              <div class="spinner-holder animated" id="menu-loading" style="display: none">
+                <div class="spinner-overlay"></div>
+                <p>Loading...</p>
+              </div>
               <!-- LINKS -->
             </div>
 
@@ -68,7 +75,7 @@
 </template>
 
 <template id="template-menu">
-  <div class="menu" id="menu-\{{id}}" style="display: none"></div>
+  <div class="menu" id="menu-\{{id}}"></div>
 </template>
 
 <script id="template-menuWidget" type="text/template">
