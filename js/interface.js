@@ -415,7 +415,7 @@
 
         saveManager();
       },
-      sort: function(id) {
+      sort: function() {
         $('#menu-' + id).sortable('refresh');
       }
     });
