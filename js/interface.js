@@ -117,6 +117,8 @@
               break;
           }
         }
+
+        Fliplet.Widget.toggleSaveButton(true);
       }
     });
 
