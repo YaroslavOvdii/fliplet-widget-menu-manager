@@ -36,21 +36,6 @@ body {
   opacity: 0.5;
 }
 
-.header-block {
-  padding-bottom: 0.5em;
-}
-
-.header-block p {
-  flex: none;
-  margin: 0;
-}
-
-.header-container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-}
-
 .widget-holder header {
   position: fixed;
   z-index: 1;
